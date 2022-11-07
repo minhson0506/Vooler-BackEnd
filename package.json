@@ -1,0 +1,23 @@
+{
+  "name": "vooler-backend",
+  "version": "1.0.0",
+  "description": "backend for vooler mobile app for exercise group of elders. Student mobile project at Metropolia UAS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minhson0506/Vooler-BackEnd.git"
+  },
+  "author": "My Mai, Son Dang, Dieu Vu, Asim Altinisik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/minhson0506/Vooler-BackEnd/issues"
+  },
+  "homepage": "https://github.com/minhson0506/Vooler-BackEnd#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
