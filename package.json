@@ -18,6 +18,10 @@
   },
   "homepage": "https://github.com/minhson0506/Vooler-BackEnd#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "pg": "^8.8.0",
+    "sqlite3": "^5.1.2"
   }
 }
