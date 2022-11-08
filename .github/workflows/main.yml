@@ -42,3 +42,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "vooler-backend"
           heroku_email: "minhson0506@gmail.com"
+      - name: Check postgre
+        run: ./check_postgres.sh
