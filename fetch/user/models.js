@@ -113,9 +113,34 @@ const getTotalStepsLastSevenDays = async (username) => {
   return totalSteps;
 };
 
+const usernameExisted = async (userName) => {
+  try {
+    var results = new Promise((resolve, reject) => {
+      db.all(
+        `SELECT * FROM users WHERE username = ?`,
+        [userName],
+        (err, rows) => {
+          if (err) {
+            throw err;
+          }
+          rows.forEach((row) => {
+            console.log(row.username);
+          });
+          resolve(rows);
+        }
+      );
+    });
+    console.log("ret in model", results);
+    return results;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   getUserByUsername,
   getAllUsers,
   getAllRecordsByUserName,
   getTotalStepsLastSevenDays,
+  usernameExisted,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../fetch/user/controller");
+const postControler = require("../post/controller");
 
 var middleware = (req, res, next) => {
   if (req.path == "/records" && req.query.user)
@@ -12,7 +13,7 @@ var middleware = (req, res, next) => {
 };
 
 router.get("/", middleware);
-router.get("/", controller.userGetAll);
+router.get("/", controller.userGetAll).post("/", postControler.createUser);
 router.get("/records", middleware);
 
 module.exports = router;
