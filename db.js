@@ -24,7 +24,7 @@ const createTable = (newdb) => {
     (
         team_id INTEGER PRIMARY KEY AUTOINCREMENT,
         team_name VARCHAR(50) NOT NULL,
-        descriptions VARCHAR(255)  NULL,
+        descriptions VARCHAR(255)  NULL
     );
     CREATE TABLE users (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +54,8 @@ const createTable = (newdb) => {
         (username, team_id)
     VALUES
         ('Jerry', 1),
-        ('George', 1);
+        ('George', 1),
+        ('Joe', null);
 
     INSERT INTO step_data
         (user_id, step_count, record_date)
