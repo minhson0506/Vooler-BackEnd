@@ -303,3 +303,4 @@ dist
 
 .env
 domain.key
+vooler.db

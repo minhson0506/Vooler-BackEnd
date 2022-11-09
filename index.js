@@ -3,6 +3,7 @@ const express = require("express");
 const http = require("http");
 const userRouter = require("./router/userRoute");
 const teamRouter = require("./router/teamRoute");
+const recordRouter = require("./router/recordRoute");
 
 const fs = require("fs");
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => res.json({ message: "alive" }));
 app.use("/user", userRouter);
 app.use("/team", teamRouter);
+app.use("/record", recordRouter);
 
 const port = 3000;
 app.listen(port, () => {

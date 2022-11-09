@@ -4,12 +4,14 @@ const fetchModel = require("../fetch/user/models");
 const { response } = require("express");
 const { httpError } = require("../utils/errors");
 
-const postNewRecord = (req, res, next) => {
+const postNewRecord = async (req, res, next) => {
   try {
-    res.json(postModel.createNewRecord(req.body));
+    const newRecord = await postModel.createNewRecord(req.body);
+    res.json(newRecord);
   } catch (err) {
     console.error(`Error while adding record `, err.message);
     next(err);
+    return;
   }
 };
 
