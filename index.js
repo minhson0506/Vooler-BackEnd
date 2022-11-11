@@ -19,7 +19,7 @@ app.use("/user", userRouter);
 app.use("/team", teamRouter);
 app.use("/record", recordRouter);
 
-const port = 3000;
+const port = 3000 || process.env.PORT;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
