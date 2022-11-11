@@ -1,11 +1,25 @@
+"use strict";
 const express = require("express");
 const http = require("http");
+const userRouter = require("./router/userRoute");
+const teamRouter = require("./router/teamRoute");
+const recordRouter = require("./router/recordRoute");
 
-const app = http.createServer((request, response) => {
-  response.writeHead(200, { "Content-Type": "text/plain" });
-  response.end("Hello World");
+const fs = require("fs");
+
+// const router = express.Router();
+
+const app = express(); // start new express application
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => res.json({ message: "alive" }));
+app.use("/user", userRouter);
+app.use("/team", teamRouter);
+app.use("/record", recordRouter);
+
+const port = 3000 || process.env.PORT;
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
-
-const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
