@@ -1,4 +1,5 @@
 "use strict";
+require("dotenv").config();
 const model = require("./models");
 const { response } = require("express");
 const { getTotalStepsLastSevenDays } = require("../user/models");

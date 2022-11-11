@@ -24,11 +24,10 @@ const createTable = (newdb) => {
     (
         team_id INTEGER PRIMARY KEY AUTOINCREMENT,
         team_name VARCHAR(50) NOT NULL,
-        descriptions VARCHAR(255)  NULL
+        descriptions VARCHAR(255) NULL
     );
     CREATE TABLE users (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username VARCHAR(50) NOT NULL UNIQUE,
         team_id INTEGER NULL,
         FOREIGN KEY (team_id)
             REFERENCES teams(team_id)
@@ -47,15 +46,15 @@ const createTable = (newdb) => {
     INSERT INTO teams
         (team_name)
     VALUES
-        ('Team 1'),
-        ('Team 2');
+        ('Team1'),
+        ('Team2');
 
     INSERT INTO users
-        (username, team_id)
+        (user_id, team_id)
     VALUES
-        ('Jerry', 1),
-        ('George', 1),
-        ('Joe', null);
+        (1, 1),
+        (2, 1),
+        (3, null);
 
     INSERT INTO step_data
         (user_id, step_count, record_date)

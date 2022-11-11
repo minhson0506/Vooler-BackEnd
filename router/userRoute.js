@@ -4,9 +4,9 @@ const controller = require("../fetch/user/controller");
 const postControler = require("../post/controller");
 
 var middleware = (req, res, next) => {
-  if (req.path == "/records" && req.query.user)
+  if (req.path == "/records" && req.query.userId)
     return controller.userGetAllRecords(req, res);
-  else if (req.query.user) return controller.userGetByName(req, res);
+  else if (req.query.userId) return controller.userGetById(req, res);
   else if (req.query.team) return controller.teamGetByName(req, res);
 
   return next();

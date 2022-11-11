@@ -10,9 +10,6 @@ const getAllUsers = async () => {
         if (err) {
           throw err;
         }
-        rows.forEach((row) => {
-          console.log(row.username);
-        });
         resolve(rows);
       });
     });
@@ -23,18 +20,18 @@ const getAllUsers = async () => {
   }
 };
 
-const getUserByUsername = async (username) => {
+const getUserByUserId = async (userId) => {
   var user = new Promise((resolve, reject) => {
     db.get(
       `SELECT
-      t1.user_id, username, team_id, total_step_last_7_days
+      t1.user_id, team_id, total_step_last_7_days
     FROM (
       SELECT
         *
       FROM
         users
       WHERE
-        username = ?) AS t1
+        user_id = ?) AS t1
       LEFT JOIN (
         SELECT
           user_id, sum(step_count) as total_step_last_7_days
@@ -46,7 +43,7 @@ const getUserByUsername = async (username) => {
               DATETIME ('now', '-7 day'))
           ORDER BY
             user_id) AS t2 ON t1.user_id = t2.user_id;`,
-      [username],
+      [userId],
       (error, row) => {
         if (error) {
           throw error;
@@ -60,7 +57,7 @@ const getUserByUsername = async (username) => {
   return user;
 };
 
-const getAllRecordsByUserName = async (username) => {
+const getAllRecordsByUserId = async (userId) => {
   var records = new Promise((resolve, reject) => {
     db.all(
       `
@@ -69,16 +66,16 @@ const getAllRecordsByUserName = async (username) => {
       WHERE
         step_data.user_id = (
           SELECT user_id FROM users
-          WHERE username = ?
+          WHERE user_id = ?
           LIMIT 1);`,
-      [username],
+      [userId],
       (err, rows) => {
         if (err) {
           throw err;
         }
-        rows.forEach((row) => {
-          console.log(row.username);
-        });
+        // rows.forEach((row) => {
+        //   console.log(row.userId);
+        // });
         resolve(rows);
       }
     );
@@ -87,7 +84,7 @@ const getAllRecordsByUserName = async (username) => {
   return records;
 };
 
-const getTotalStepsLastSevenDays = async (username) => {
+const getTotalStepsLastSevenDays = async (userId) => {
   var totalSteps = new Promise((resolve, reject) => {
     db.get(
       `SELECT user_id, SUM(step_count) as total_step 
@@ -96,10 +93,10 @@ const getTotalStepsLastSevenDays = async (username) => {
         record_date >= (SELECT DATETIME ('now', '-7 day'))
       AND user_id =  (
         SELECT user_id FROM users
-        WHERE username = ?
+        WHERE user_id = ?
         LIMIT 1
         );`,
-      [username],
+      [userId],
       (err, rows) => {
         if (err) {
           throw err;
@@ -138,9 +135,9 @@ const usernameExisted = async (userName) => {
 };
 
 module.exports = {
-  getUserByUsername,
+  getUserByUserId,
   getAllUsers,
-  getAllRecordsByUserName,
+  getAllRecordsByUserId,
   getTotalStepsLastSevenDays,
   usernameExisted,
 };
