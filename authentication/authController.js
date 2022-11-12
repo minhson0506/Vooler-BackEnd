@@ -2,6 +2,7 @@
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const { httpError } = require("../utils/errors");
+const userModel = require("../user/userModel");
 
 const login = (req, res, next) => {
   passport.authenticate("local", { session: false }, (err, user, info) => {
@@ -23,6 +24,30 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
+const registerUser = async (req, res, next) => {
+  try {
+    const user = req.body;
+    user.user_id = req.body.userId;
+    user.password = req.body.password;
+    user.team_id = req.body.teamId;
+
+    const userIdExisted = await userModel.userIdExisted(req.body.userId);
+    console.log("existing username", userIdExisted);
+    if (userIdExisted.length !== 0) {
+      res.json({ message: `Username is taken!`, usernameValid: false });
+    } else {
+      const newUser = await userModel.createNewUser(user);
+      res.json({ message: newUser, usernameValid: true });
+    }
+  } catch (e) {
+    console.log("register new user error", e.message);
+    const err = httpError("Error registering new user", 400);
+    next(err);
+    return;
+  }
+};
+
 module.exports = {
   login,
+  registerUser,
 };

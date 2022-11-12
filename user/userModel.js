@@ -1,5 +1,5 @@
 const sqlite3 = require("sqlite3").verbose();
-const { createDbConnection } = require("../../db");
+const { createDbConnection } = require("../db");
 
 let db = createDbConnection();
 
@@ -110,35 +110,10 @@ const getTotalStepsLastSevenDays = async (userId) => {
   return totalSteps;
 };
 
-const userIdExisted = async (userName) => {
+const userIdExisted = async (userId) => {
   try {
     var results = new Promise((resolve, reject) => {
-      db.all(
-        `SELECT * FROM users WHERE user_id = ?`,
-        [userName],
-        (err, rows) => {
-          if (err) {
-            throw err;
-          }
-          rows.forEach((row) => {
-            console.log(row.username);
-          });
-          resolve(rows);
-        }
-      );
-    });
-    console.log("ret in model", results);
-    return results;
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-const getUserLogin = async (params) => {
-  try {
-    console.log(params);
-    var results = new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM users WHERE user_id = ?`, [params], (err, rows) => {
+      db.all(`SELECT * FROM users WHERE user_id = ?`, [userId], (err, rows) => {
         if (err) {
           throw err;
         }
@@ -155,6 +130,48 @@ const getUserLogin = async (params) => {
   }
 };
 
+const getUserLogin = async (userId) => {
+  try {
+    console.log(userId);
+    var results = new Promise((resolve, reject) => {
+      db.all(`SELECT * FROM users WHERE user_id = ?`, [userId], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        rows.forEach((row) => {
+          console.log(row.user_id);
+        });
+        resolve(rows);
+      });
+    });
+    console.log("ret in model", results);
+    return results;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const createNewUser = async (user) => {
+  try {
+    var results = new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO users (user_id, password, team_id) VALUES (?, ?, ?);`,
+        [user.user_id, user.password, user.team_id],
+        function (err) {
+          if (err) throw err;
+          resolve({
+            user_id: this.lastID,
+            team_id: user.team_id,
+          });
+        }
+      );
+    });
+    return results;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   getUserByUserId,
   getAllUsers,
@@ -162,4 +179,5 @@ module.exports = {
   getTotalStepsLastSevenDays,
   userIdExisted,
   getUserLogin,
+  createNewUser,
 };

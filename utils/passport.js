@@ -4,18 +4,17 @@ const Strategy = require("passport-local").Strategy;
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const { getUserLogin } = require("../fetch/user/userModel");
+const { getUserLogin } = require("../user/userModel");
 
 // local strategy for userId password login
 passport.use(
   new Strategy(
     {
-      usernameField: "user_id",
+      usernameField: "userId",
       passwordField: "password",
     },
-
-    async (user_id, password, done) => {
-      const params = [user_id];
+    async (userId, password, done) => {
+      const params = [userId];
       try {
         const [user] = await getUserLogin(params);
         console.log("Local strategy", user); // result is binary row
@@ -25,6 +24,7 @@ passport.use(
         if (user.password !== password) {
           return done(null, false, { message: "Incorrect password." });
         }
+        delete user.password;
         return done(null, { ...user }, { message: "Logged In Successfully" }); // use spread syntax to create shallow copy to get rid of binary row type
       } catch (err) {
         return done(err);

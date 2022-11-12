@@ -1,5 +1,5 @@
 "use strict";
-const { createDbConnection } = require("../../db");
+const { createDbConnection } = require("../db");
 
 let db = createDbConnection();
 
