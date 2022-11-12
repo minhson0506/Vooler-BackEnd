@@ -160,7 +160,8 @@ const createNewUser = async (user) => {
         function (err) {
           if (err) throw err;
           resolve({
-            user_id: this.lastID,
+            row_added: this.lastID,
+            user_id: user.user_id,
             team_id: user.team_id,
           });
         }

@@ -34,7 +34,7 @@ const registerUser = async (req, res, next) => {
     const userIdExisted = await userModel.userIdExisted(req.body.userId);
     console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
-      res.json({ message: `Username is taken!`, usernameValid: false });
+      res.json({ message: `UserID is taken!`, usernameValid: false });
     } else {
       const newUser = await userModel.createNewUser(user);
       res.json({ message: newUser, usernameValid: true });
