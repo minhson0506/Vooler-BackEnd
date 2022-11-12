@@ -1,7 +1,7 @@
 "use strict";
 require("dotenv").config();
 const postModel = require("./models");
-const fetchModel = require("../fetch/user/models");
+const fetchModel = require("../fetch/user/userModel");
 const { response } = require("express");
 const { httpError } = require("../utils/errors");
 
@@ -19,10 +19,10 @@ const postNewRecord = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const user = req.body;
-    user.username = req.body.username;
-    user.team_id = req.body.team_id;
+    user.user_id = req.body.userId;
+    user.team_id = req.body.teamId;
 
-    const usernameExisted = await fetchModel.usernameExisted(req.body.username);
+    const usernameExisted = await fetchModel.userIdExisted(req.body.username);
     console.log("existing username", usernameExisted);
     if (usernameExisted.length !== 0) {
       res.json({ message: `Username is taken!`, usernameValid: false });

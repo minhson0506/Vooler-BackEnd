@@ -1,8 +1,6 @@
 "use strict";
 require("dotenv").config();
-const model = require("./models");
-const { response } = require("express");
-const { getTotalStepsLastSevenDays } = require("../user/models");
+const model = require("./teamModel");
 
 const getAllTeams = async (req, res) => {
   const teams = await model.getAllTeams();

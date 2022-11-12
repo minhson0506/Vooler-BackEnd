@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../fetch/team/controller");
+const controller = require("../fetch/team/teamController");
 
 var middleware = (req, res, next) => {
   if (req.query.team_name) return controller.getTeamMembersByTeamName(req, res);

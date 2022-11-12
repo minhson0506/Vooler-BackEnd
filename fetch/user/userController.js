@@ -1,6 +1,6 @@
 "use strict";
 require("dotenv").config();
-const fetchModel = require("./models");
+const fetchModel = require("./userModel");
 const postModel = require("../../post/models");
 const { response } = require("express");
 const { checkToken } = require("../../utils/checkToken");

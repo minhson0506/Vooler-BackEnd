@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../fetch/user/controller");
+const controller = require("../fetch/user/userController");
 const postControler = require("../post/controller");
 
 var middleware = (req, res, next) => {

@@ -110,11 +110,11 @@ const getTotalStepsLastSevenDays = async (userId) => {
   return totalSteps;
 };
 
-const usernameExisted = async (userName) => {
+const userIdExisted = async (userName) => {
   try {
     var results = new Promise((resolve, reject) => {
       db.all(
-        `SELECT * FROM users WHERE username = ?`,
+        `SELECT * FROM users WHERE user_id = ?`,
         [userName],
         (err, rows) => {
           if (err) {
@@ -134,10 +134,32 @@ const usernameExisted = async (userName) => {
   }
 };
 
+const getUserLogin = async (params) => {
+  try {
+    console.log(params);
+    var results = new Promise((resolve, reject) => {
+      db.all(`SELECT * FROM users WHERE user_id = ?`, [params], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        rows.forEach((row) => {
+          console.log(row.user_id);
+        });
+        resolve(rows);
+      });
+    });
+    console.log("ret in model", results);
+    return results;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   getUserByUserId,
   getAllUsers,
   getAllRecordsByUserId,
   getTotalStepsLastSevenDays,
-  usernameExisted,
+  userIdExisted,
+  getUserLogin,
 };

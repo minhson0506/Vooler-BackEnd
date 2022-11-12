@@ -27,7 +27,8 @@ const createTable = (newdb) => {
         descriptions VARCHAR(255) NULL
     );
     CREATE TABLE users (
-        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT UNIQUE PRIMARY KEY,
+        password TEXT NOT NULL,
         team_id INTEGER NULL,
         FOREIGN KEY (team_id)
             REFERENCES teams(team_id)
@@ -50,18 +51,18 @@ const createTable = (newdb) => {
         ('Team2');
 
     INSERT INTO users
-        (user_id, team_id)
+        (user_id, password, team_id)
     VALUES
-        (1, 1),
-        (2, 1),
-        (3, null);
+        ("Joe", "1234" , 1),
+        ("Jane", "1234" ,1),
+        ("Doe", "1234", null);
 
     INSERT INTO step_data
         (user_id, step_count, record_date)
     VALUES
-        (1, 500, '2022-11-07 23:59:59'),
-        (1, 1234, '2022-11-08 23:59:59'),
-        (2, 500, '2022-11-08 23:59:59');
+        ("Joe", 500, '2022-11-07 23:59:59'),
+        ("Joe", 1234, '2022-11-08 23:59:59'),
+        ("Jane", 500, '2022-11-08 23:59:59');
     `
   );
 };
