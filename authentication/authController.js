@@ -3,11 +3,14 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const { httpError } = require("../utils/errors");
 const userModel = require("../user/userModel");
+const bcrypt = require("bcryptjs");
+
+const { salt } = require("../salt");
 
 const login = (req, res, next) => {
   passport.authenticate("local", { session: false }, (err, user, info) => {
     console.log("local params", err, user, info);
-    console.log(req.body);
+    console.log("login req body", req.body);
     if (err || !user) {
       next(httpError("Invalid login credentials", 401));
       return;
@@ -31,10 +34,13 @@ const registerUser = async (req, res, next) => {
     user.password = req.body.password;
     user.team_id = req.body.teamId;
 
-    const userIdExisted = await userModel.userIdExisted(req.body.userId);
+    const userIdExisted = await userModel.userIdExisted(user.user_id);
     console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
-      res.json({ message: `UserID is taken!`, usernameValid: false });
+      const err = httpError(`UserID is taken!`, 403);
+      next(err);
+      return;
+      // res.json({ message: `UserID is taken!`, usernameValid: false });
     } else {
       const newUser = await userModel.createNewUser(user);
       console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
@@ -51,7 +57,12 @@ const registerUser = async (req, res, next) => {
   }
 };
 
+const getSalt = (req, res, next) => {
+  res.json({ salt: salt });
+};
+
 module.exports = {
   login,
   registerUser,
+  getSalt,
 };

@@ -5,8 +5,12 @@ const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const { getUserLogin } = require("../user/userModel");
+const bcrypt = require("bcryptjs");
 
+const { salt } = require("../salt");
+const { getHash } = require("../utils/getHash");
 // local strategy for userId password login
+
 passport.use(
   new Strategy(
     {
@@ -14,14 +18,13 @@ passport.use(
       passwordField: "password",
     },
     async (userId, password, done) => {
-      const params = [userId];
       try {
-        const [user] = await getUserLogin(params);
+        const [user] = await getUserLogin(userId);
         console.log("Local strategy", user); // result is binary row
         if (!user) {
-          return done(null, false, { message: "Incorrect user Id." });
+          return done(null, false, { message: "Incorrect user Id" });
         }
-        if (user.password !== password) {
+        if (password != user.password) {
           return done(null, false, { message: "Incorrect password." });
         }
         delete user.password;
