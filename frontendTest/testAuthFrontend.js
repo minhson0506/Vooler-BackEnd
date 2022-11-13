@@ -1,6 +1,5 @@
-const { register, login } = require("./frontendUtils");
-const { createDbConnection } = require("../../db");
-let db = createDbConnection();
+const { register, login } = require("./frontendTestUtils");
+const { createDbConnection } = require("../db");
 
 const userId = "Test";
 const password = "1234";
