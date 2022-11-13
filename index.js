@@ -11,7 +11,7 @@ const authRouter = require("./router/authRoute");
 
 const fs = require("fs");
 
-// const router = express.Router();
+// process.env.NODE_ENV = "production";
 
 const app = express(); // start new express application
 

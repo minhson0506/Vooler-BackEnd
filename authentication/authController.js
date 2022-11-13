@@ -9,7 +9,7 @@ const login = (req, res, next) => {
     console.log("local params", err, user, info);
     console.log(req.body);
     if (err || !user) {
-      next(httpError("username / password incorrect", 400));
+      next(httpError("Invalid login credentials", 401));
       return;
     }
 
