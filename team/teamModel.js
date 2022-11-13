@@ -11,7 +11,7 @@ const getAllTeams = async () => {
           throw err;
         }
         rows.forEach((row) => {
-          console.log(row.teamName);
+          console.log(row.team_name);
         });
         resolve(rows);
       });
@@ -23,7 +23,7 @@ const getAllTeams = async () => {
   }
 };
 
-const getTeamInfoByTeamName = async (teamName) => {
+const getTeamInfoByTeamId = async (teamId) => {
   var team = new Promise((resolve, reject) => {
     db.all(
       `SELECT
@@ -31,7 +31,6 @@ const getTeamInfoByTeamName = async (teamName) => {
   FROM (
       SELECT
           user_id,
-          username,
           u.team_id,
           team_name
       FROM
@@ -39,7 +38,7 @@ const getTeamInfoByTeamName = async (teamName) => {
       LEFT JOIN teams t
   WHERE
       u.team_id = t.team_id
-      AND t.team_name = ?) AS t1
+      AND t.team_id = ?) AS t1
       JOIN (
           SELECT
               user_id, SUM(step_count) AS total_step_last_7_days
@@ -51,7 +50,7 @@ const getTeamInfoByTeamName = async (teamName) => {
                       DATETIME ('now', '-7 day'))
               GROUP BY
                   user_id) AS t2 ON t1.user_id = t2.user_id;`,
-      [teamName],
+      [teamId],
       (error, rows) => {
         if (error) {
           throw error;
@@ -65,4 +64,4 @@ const getTeamInfoByTeamName = async (teamName) => {
   return team;
 };
 
-module.exports = { getAllTeams, getTeamInfoByTeamName };
+module.exports = { getAllTeams, getTeamInfoByTeamId };

@@ -4,7 +4,9 @@ const fs = require("fs");
 
 const createDbConnection = () => {
   if (fs.existsSync(filepath)) {
-    return new sqlite3.Database(filepath);
+    let db = new sqlite3.Database(filepath);
+    activateForeignKeys(db);
+    return db;
   } else {
     const db = new sqlite3.Database(filepath, (error) => {
       if (error) {
@@ -20,6 +22,7 @@ const createDbConnection = () => {
 const createTable = (newdb) => {
   newdb.exec(
     `
+    PRAGMA foreign_keys = ON;
     CREATE TABLE teams
     (
         team_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,16 +33,18 @@ const createTable = (newdb) => {
         user_id TEXT UNIQUE PRIMARY KEY,
         password TEXT NOT NULL,
         team_id INTEGER NULL,
+        CONSTRAINT fk_user_team
         FOREIGN KEY (team_id)
             REFERENCES teams(team_id)
     );
     CREATE TABLE step_data
     (
         record_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
+        user_id TEXT NOT NULL,
         step_count INTEGER NOT NULL,
         record_date DATE NOT NULL,
         init_data_in_date INTEGER NULL,
+        CONSTRAINT fk_step_user
         FOREIGN KEY (user_id)
             REFERENCES users(user_id)
     );
@@ -47,8 +52,8 @@ const createTable = (newdb) => {
     INSERT INTO teams
         (team_name)
     VALUES
-        ('Team1'),
-        ('Team2');
+        ('Hoiva Mehiläinen'),
+        ('Koti ja Tähti');
 
     INSERT INTO users
         (user_id, password, team_id)
@@ -63,6 +68,14 @@ const createTable = (newdb) => {
         ("Joe", 500, '2022-11-07 23:59:59'),
         ("Joe", 1234, '2022-11-08 23:59:59'),
         ("Jane", 500, '2022-11-08 23:59:59');
+    `
+  );
+};
+
+const activateForeignKeys = (db) => {
+  db.exec(
+    `
+    PRAGMA foreign_keys = ON;
     `
   );
 };

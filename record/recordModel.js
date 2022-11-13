@@ -15,7 +15,7 @@ const createNewRecord = async (record) => {
             VALUES (?, ?, ?)`,
         [record.user_id, record.step_count, record.record_date],
         function (err) {
-          if (err) throw err;
+          if (err) reject(err);
           resolve({
             succesfully_saved: true,
             saved_timestamp: new Date(),

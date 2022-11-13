@@ -10,8 +10,8 @@ const postNewRecord = async (req, res, next) => {
     const newRecord = await postModel.createNewRecord(req.body);
     res.json(newRecord);
   } catch (err) {
-    console.error(`Error while adding record `, err.message);
-    next(err);
+    const error = httpError(`Error adding new record, check user info`, 400);
+    next(error);
     return;
   }
 };

@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../team/teamController");
 
 var middleware = (req, res, next) => {
-  if (req.query.team_name) return controller.getTeamMembersByTeamName(req, res);
+  if (req.query.teamId) return controller.getTeamMembersByTeamId(req, res);
   return next();
 };
 

@@ -7,9 +7,9 @@ const getAllTeams = async (req, res) => {
   res.json(teams);
 };
 
-const getTeamMembersByTeamName = async (req, res) => {
+const getTeamMembersByTeamId = async (req, res) => {
   var returnObject = {};
-  const teamMembers = await model.getTeamInfoByTeamName(req.query.team_name);
+  const teamMembers = await model.getTeamInfoByTeamId(req.query.teamId);
   returnObject.team_id = teamMembers.map((t) => t.team_id)[0];
   returnObject.team_name = req.query.team_name;
   returnObject.total_team_steps_last_7_days = teamMembers
@@ -25,4 +25,4 @@ const getTeamMembersByTeamName = async (req, res) => {
   res.json(returnObject);
 };
 
-module.exports = { getAllTeams, getTeamMembersByTeamName };
+module.exports = { getAllTeams, getTeamMembersByTeamId };

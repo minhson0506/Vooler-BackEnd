@@ -152,25 +152,20 @@ const getUserLogin = async (userId) => {
 };
 
 const createNewUser = async (user) => {
-  try {
-    var results = new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO users (user_id, password, team_id) VALUES (?, ?, ?);`,
-        [user.user_id, user.password, user.team_id],
-        function (err) {
-          if (err) throw err;
-          resolve({
-            row_added: this.lastID,
-            user_id: user.user_id,
-            team_id: user.team_id,
-          });
-        }
-      );
-    });
-    return results;
-  } catch (e) {
-    console.log(e);
-  }
+  var results = new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO users (user_id, password, team_id) VALUES (?, ?, ?);`,
+      [user.user_id, user.password, user.team_id],
+      function (err) {
+        if (err) reject(err);
+        resolve({
+          row_added: this.lastID,
+          user_id: user.user_id,
+        });
+      }
+    );
+  });
+  return results;
 };
 
 module.exports = {

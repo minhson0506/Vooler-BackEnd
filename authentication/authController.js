@@ -37,11 +37,15 @@ const registerUser = async (req, res, next) => {
       res.json({ message: `UserID is taken!`, usernameValid: false });
     } else {
       const newUser = await userModel.createNewUser(user);
+      console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
       res.json({ message: newUser, usernameValid: true });
     }
   } catch (e) {
     console.log("register new user error", e.message);
-    const err = httpError("Error registering new user", 400);
+    const err = httpError(
+      `Error registering new user, recheck register info`,
+      400
+    );
     next(err);
     return;
   }
