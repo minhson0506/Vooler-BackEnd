@@ -1,8 +1,6 @@
 "use strict";
 require("dotenv").config();
 const postModel = require("./recordModel");
-const fetchModel = require("../user/userModel");
-const { response } = require("express");
 const { httpError } = require("../utils/errors");
 
 const postNewRecord = async (req, res, next) => {
