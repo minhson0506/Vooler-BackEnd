@@ -300,4 +300,6 @@ dist
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/node,visualstudiocode,macos
-
+domain.key
+vooler.db
+*.db
