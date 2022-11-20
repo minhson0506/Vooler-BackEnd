@@ -1,7 +1,6 @@
 "use strict";
 require("dotenv").config();
 const fetchModel = require("./userModel");
-const postModel = require("../record/recordModel");
 const e = require("express");
 
 // USER DATA
@@ -13,7 +12,11 @@ const userGetById = async (req, res) => {
 
 const userGetAll = async (req, res) => {
   const users = await fetchModel.getAllUsers();
-  res.json(users);
+  const redactedUsers = users.map((u) => {
+    delete u.password;
+    return u;
+  });
+  res.json(redactedUsers);
 };
 
 const userGetAllRecords = async (req, res) => {
@@ -22,8 +25,17 @@ const userGetAllRecords = async (req, res) => {
   res.json(records);
 };
 
+const userGetRecordFromDate = async (req, res) => {
+  const records = await fetchModel.getRecordsByUserIdAndStartDate(
+    req.query.userId,
+    req.query.startDate
+  );
+  res.json(records);
+};
+
 module.exports = {
   userGetById,
   userGetAll,
   userGetAllRecords,
+  userGetRecordFromDate,
 };

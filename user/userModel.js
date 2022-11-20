@@ -168,6 +168,22 @@ const createNewUser = async (user) => {
   return results;
 };
 
+const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
+  var results = new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM step_data s
+      WHERE user_id = ?
+      AND s.record_date >= ?;`,
+      [userId, startDate],
+      (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      }
+    );
+  });
+  return results;
+};
+
 module.exports = {
   getUserByUserId,
   getAllUsers,
@@ -176,4 +192,5 @@ module.exports = {
   userIdExisted,
   getUserLogin,
   createNewUser,
+  getRecordsByUserIdAndStartDate,
 };

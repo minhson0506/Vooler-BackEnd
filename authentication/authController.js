@@ -44,7 +44,7 @@ const registerUser = async (req, res, next) => {
     } else {
       const newUser = await userModel.createNewUser(user);
       console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
-      res.json({ message: newUser, usernameValid: true });
+      res.status(201).end();
     }
   } catch (e) {
     console.log("register new user error", e.message);
