@@ -6,7 +6,6 @@ const {
   registerUser,
   getSalt,
 } = require("../authentication/authController");
-const { route } = require("./userRoute");
 
 router.post("/login", login);
 router.post("/register", registerUser);

@@ -14,5 +14,6 @@ var middleware = (req, res, next) => {
 router.get("/", middleware);
 router.get("/", controller.userGetAll);
 router.get("/records", middleware);
+router.put("/", controller.userEditTeamId);
 
 module.exports = router;

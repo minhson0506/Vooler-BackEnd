@@ -184,6 +184,22 @@ const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
   return results;
 };
 
+const updateTeamIdForUserId = async (userId, teamdId) => {
+  var results = new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE users
+      SET team_id= ?
+      WHERE user_id= ?;`,
+      [teamdId, userId],
+      function (err, row) {
+        if (err) reject(err);
+        resolve(row);
+      }
+    );
+  });
+  return results;
+};
+
 module.exports = {
   getUserByUserId,
   getAllUsers,
@@ -193,4 +209,5 @@ module.exports = {
   getUserLogin,
   createNewUser,
   getRecordsByUserIdAndStartDate,
+  updateTeamIdForUserId,
 };

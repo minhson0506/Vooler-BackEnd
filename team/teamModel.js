@@ -23,45 +23,64 @@ const getAllTeams = async () => {
   }
 };
 
-const getTeamInfoByTeamId = async (teamId) => {
-  var team = new Promise((resolve, reject) => {
-    db.all(
-      `SELECT
+const teamInfoQuery = (dateCondition, stepColumnName) => {
+  const sqlString = `SELECT
       *
-  FROM (
+    FROM (
       SELECT
-          user_id,
-          u.team_id,
-          team_name
+        u.user_id,
+        t.team_id,
+        team_name
       FROM
-          users u
+        users u
       LEFT JOIN teams t
-  WHERE
+    WHERE
       u.team_id = t.team_id
       AND t.team_id = ?) AS t1
-      JOIN (
-          SELECT
-              user_id, SUM(step_count) AS total_step_last_7_days
-          FROM
-              step_data
-          WHERE
-              record_date >= (
-                  SELECT
-                      DATETIME ('now', '-7 day'))
-              GROUP BY
-                  user_id) AS t2 ON t1.user_id = t2.user_id;`,
-      [teamId],
-      (error, rows) => {
-        if (error) {
-          throw error;
-        }
-        console.log("result in model", rows);
-        resolve(rows);
+      LEFT JOIN (
+        SELECT
+          user_id AS step_userId , SUM(step_count) AS ${stepColumnName}
+        FROM
+          step_data
+        WHERE
+          record_date >= ${dateCondition}
+          GROUP BY
+            user_id) AS t2 ON t1.user_id = t2.step_userId;`;
+  return sqlString;
+};
+
+const getTeamInfoByTeamId = async (teamId) => {
+  const query = teamInfoQuery(
+    `(
+    SELECT
+        DATETIME ('now', '-7 day'))`,
+    "total_step_last_7_days"
+  );
+  var team = new Promise((resolve, reject) => {
+    db.all(query, [teamId], (error, rows) => {
+      if (error) {
+        throw error;
       }
-    );
+      console.log("result in model", rows);
+      resolve(rows);
+    });
   });
-  console.log("team in model", team);
   return team;
 };
 
-module.exports = { getAllTeams, getTeamInfoByTeamId };
+const getTeamInfoWithStartDate = async (teamId, startDate) => {
+  const query = teamInfoQuery("?", "total_step_from_startDate");
+  var team = new Promise((resolve, reject) => {
+    db.all(query, [teamId, startDate], (error, rows) => {
+      if (error) {
+        throw error;
+      }
+      resolve(rows);
+    });
+  });
+  console.log("result in model", team);
+
+  return team;
+};
+
+module.exports = { getAllTeams, getTeamInfoByTeamId, getTeamInfoWithStartDate };

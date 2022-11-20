@@ -40,7 +40,6 @@ const registerUser = async (req, res, next) => {
       const err = httpError(`UserID is taken!`, 403);
       next(err);
       return;
-      // res.json({ message: `UserID is taken!`, usernameValid: false });
     } else {
       const newUser = await userModel.createNewUser(user);
       console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
