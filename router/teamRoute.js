@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../fetch/team/controller");
+const controller = require("../team/teamController");
 
 var middleware = (req, res, next) => {
-  if (req.query.team_name) return controller.getTeamMembersByTeamName(req, res);
+  if (req.query.teamId && !req.query.startDate)
+    return controller.getTeamMembersByTeamId(req, res, next);
+  else if (req.query.teamId && req.query.startDate)
+    return controller.getTeamInfoWithStartDate(req, res, next);
+
   return next();
 };
 
