@@ -7,7 +7,16 @@ const bcrypt = require("bcryptjs");
 
 const { salt } = require("../salt");
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
+  // Check if user is existing:
+  const userIdExisted = await userModel.userIdExisted(req.body.userId);
+  console.log("existing username", userIdExisted);
+  if (userIdExisted.length === 0) {
+    const err = httpError("userId not found", 404);
+    next(err);
+    return;
+  }
+  // If user is not existing, check if userId and password match:
   passport.authenticate("local", { session: false }, (err, user, info) => {
     console.log("local params", err, user, info);
     console.log("login req body", req.body);
@@ -37,7 +46,7 @@ const registerUser = async (req, res, next) => {
     const userIdExisted = await userModel.userIdExisted(user.user_id);
     console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
-      const err = httpError(`UserID is taken!`, 403);
+      const err = httpError(`UserID is taken`, 403);
       next(err);
       return;
     } else {

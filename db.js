@@ -52,8 +52,12 @@ const createTable = (newdb) => {
     INSERT INTO teams
         (team_name)
     VALUES
-        ('Hoiva Mehiläinen'),
-        ('Koti ja Tähti');
+        ('Team 1'),
+        ('Team 2'),
+        ('Team 3'),
+        ('Team 4'),
+        ('Team 5'),
+        ('Team 6'),
 
     INSERT INTO users
         (user_id, password, team_id)
