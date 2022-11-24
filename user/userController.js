@@ -40,8 +40,7 @@ const userEditTeamId = async (req, res, next) => {
     res.json({ message: "Updated teamID" });
   } catch (e) {
     console.log("edit team id for user error", e.message);
-    const err = httpError(`Error editing team, recheck team id`, 400);
-    next(err);
+    res.status(400).json({ error: "cannot edit teamId, recheck teamId" });
     return;
   }
 };

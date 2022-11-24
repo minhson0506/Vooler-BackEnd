@@ -159,7 +159,7 @@ const createNewUser = async (user) => {
       function (err) {
         if (err) reject(err);
         resolve({
-          row_added: this.lastID,
+          uid: this.lastID,
           user_id: user.user_id,
         });
       }

@@ -33,8 +33,7 @@ const processTeamData = (teamDataObject, withStartDate) => {
 const getTeamMembersByTeamId = async (req, res, next) => {
   const teamMembers = await model.getTeamInfoByTeamId(req.query.teamId);
   if (teamMembers.length === 0) {
-    const err = httpError(`teamID invalid`, 400);
-    next(err);
+    res.status(400).json({ error: "invalid teamId" });
     return;
   }
   const returnObject = processTeamData(teamMembers, false);
@@ -48,8 +47,7 @@ const getTeamInfoWithStartDate = async (req, res, next) => {
     req.query.startDate
   );
   if (teamMembers.length === 0) {
-    const err = httpError(`teamID invalid`, 400);
-    next(err);
+    res.status(400).json({ error: "invalid teamId" });
     return;
   }
   const returnObject = processTeamData(teamMembers, true);

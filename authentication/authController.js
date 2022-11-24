@@ -46,12 +46,13 @@ const registerUser = async (req, res, next) => {
     const userIdExisted = await userModel.userIdExisted(user.user_id);
     console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
-      res.status(500).json({ error: "userId is taken" });
+      res.status(403).json({ error: "userId is taken" });
       return;
     } else {
       const newUser = await userModel.createNewUser(user);
       console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
-      res.status(201).end();
+      res.status(201).json({ uid: newUser.uid });
+      return;
     }
   } catch (e) {
     console.log("register new user error", e.message);
