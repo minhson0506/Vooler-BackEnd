@@ -2,6 +2,8 @@
 require("dotenv").config();
 const recordModel = require("./recordModel");
 const { httpError } = require("../utils/errors");
+const { dateIsValid } = require("../utils/utils");
+
 const jwt = require("jsonwebtoken");
 
 const postNewRecord = async (req, res, next) => {
@@ -11,6 +13,15 @@ const postNewRecord = async (req, res, next) => {
     console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
+
+  if (
+    typeof req.body.stepCount !== "number" ||
+    !dateIsValid(req.body.recordDate)
+  ) {
+    res.status(400).json({ error: "wrong data format" });
+    return;
+  }
+
   const existingEntryForDate = await recordModel.checkExistingEntryForDate(
     req.body.recordDate,
     uid
@@ -18,7 +29,9 @@ const postNewRecord = async (req, res, next) => {
   console.log("existing entry: ", existingEntryForDate.length);
   if (existingEntryForDate.length !== 0) {
     res.status(409).json({ error: "record for date existed" });
+    return;
   }
+
   try {
     const newRecord = await recordModel.createNewRecord(uid, req.body);
     res.json(newRecord);
@@ -28,4 +41,4 @@ const postNewRecord = async (req, res, next) => {
   }
 };
 
-module.exports = { postNewRecord };
+const putRecord = (module.exports = { postNewRecord });

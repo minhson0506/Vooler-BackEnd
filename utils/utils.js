@@ -9,4 +9,25 @@ const getPreviousSundayDateString = (date = new Date()) => {
     .replaceAll("/", "-");
 };
 
-module.exports = { getPreviousSundayDateString };
+const dateIsValid = (dateStr) => {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+
+  if (dateStr.match(regex) === null) {
+    return false;
+  }
+
+  const date = new Date(dateStr);
+  console.log(date);
+
+  const timestamp = date.getTime();
+  console.log(timestamp);
+
+  if (typeof timestamp !== "number" || Number.isNaN(timestamp)) {
+    // 👇️ this runs
+    return false;
+  }
+
+  return date.toISOString().startsWith(dateStr);
+};
+
+module.exports = { getPreviousSundayDateString, dateIsValid };

@@ -38,7 +38,7 @@ const createTable = (newdb) => {
         FOREIGN KEY (team_id)
             REFERENCES teams(team_id)
     );
-    CREATE TABLE step_data
+    CREATE TABLE step_data 
     (
         record_id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
