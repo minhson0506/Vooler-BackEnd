@@ -8,7 +8,6 @@ const userRouter = require("./router/userRoute");
 const teamRouter = require("./router/teamRoute");
 const recordRouter = require("./router/recordRoute");
 const authRouter = require("./router/authRoute");
-
 const fs = require("fs");
 
 // process.env.NODE_ENV = "production";

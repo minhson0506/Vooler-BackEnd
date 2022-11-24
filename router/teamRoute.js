@@ -4,10 +4,10 @@ const controller = require("../team/teamController");
 const passport = require("../utils/passport");
 
 var middleware = (req, res, next) => {
-  if (req.query.teamId && !req.query.startDate)
+  if (req.query.teamId && !req.query.endDate)
     return controller.getTeamMembersByTeamId(req, res, next);
-  else if (req.query.teamId && req.query.startDate)
-    return controller.getTeamInfoWithStartDate(req, res, next);
+  else if (req.query.teamId && req.query.endDate)
+    return controller.getTeamInfoWithEndDate(req, res, next);
 
   return next();
 };

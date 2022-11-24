@@ -23,6 +23,7 @@ const login = async (req, res, next) => {
       res.status(401).json({ error: "invalid login credentials" });
       return;
     }
+    delete user.user_id;
 
     req.login(user, { session: false }, (err) => {
       if (err) {

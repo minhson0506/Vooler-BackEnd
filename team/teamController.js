@@ -1,20 +1,20 @@
 "use strict";
 require("dotenv").config();
 const model = require("./teamModel");
-const { httpError } = require("../utils/errors");
+const { getPreviousSundayDateString } = require("../utils/utils");
 
 const getAllTeams = async (req, res) => {
   const teams = await model.getAllTeams();
   res.json(teams);
 };
 
-const processTeamData = (teamDataObject, withStartDate) => {
+const processTeamData = (teamDataObject, withEndDate) => {
   var returnObject = {};
   returnObject.team_name = teamDataObject.map((t) => t.team_name)[0];
   returnObject.team_id = teamDataObject.map((t) => t.team_id)[0];
-  if (withStartDate) {
-    returnObject.total_team_steps_from_start_date = teamDataObject
-      .map((t) => t.total_step_from_startDate)
+  if (withEndDate) {
+    returnObject.total_team_steps_accumulated = teamDataObject
+      .map((t) => t.total_steps_accumulated)
       .reduce((a, b) => a + b, 0);
   } else {
     returnObject.total_team_steps_last_7_days = teamDataObject
@@ -41,16 +41,21 @@ const getTeamMembersByTeamId = async (req, res, next) => {
   res.json(returnObject);
 };
 
-const getTeamInfoWithStartDate = async (req, res, next) => {
-  const teamMembers = await model.getTeamInfoWithStartDate(
+const getTeamInfoWithEndDate = async (req, res, next) => {
+  const teamMembers = await model.getTeamInfoWithEndDate(
     req.query.teamId,
-    req.query.startDate
+    req.query.endDate
   );
   if (teamMembers.length === 0) {
     res.status(400).json({ error: "invalid teamId" });
     return;
   }
   const returnObject = processTeamData(teamMembers, true);
+  returnObject.start_date = getPreviousSundayDateString(
+    new Date(req.query.endDate)
+  );
+  returnObject.end_date = req.query.endDate;
+
   console.log("result in controller", returnObject);
   res.json(returnObject);
 };
@@ -58,5 +63,5 @@ const getTeamInfoWithStartDate = async (req, res, next) => {
 module.exports = {
   getAllTeams,
   getTeamMembersByTeamId,
-  getTeamInfoWithStartDate,
+  getTeamInfoWithEndDate,
 };

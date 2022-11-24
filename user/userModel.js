@@ -20,18 +20,18 @@ const getAllUsers = async () => {
   }
 };
 
-const getUserByUserId = async (userId) => {
+const getUserByUserId = async (uid) => {
   var user = new Promise((resolve, reject) => {
     db.get(
       `SELECT
-      t1.user_id, team_id, total_step_last_7_days
+      t1.uid, team_id, total_step_last_7_days
     FROM (
       SELECT
         *
       FROM
         users
       WHERE
-        user_id = ?) AS t1
+        uid = ?) AS t1
       LEFT JOIN (
         SELECT
           user_id, sum(step_count) as total_step_last_7_days
@@ -43,7 +43,7 @@ const getUserByUserId = async (userId) => {
               DATETIME ('now', '-7 day'))
           ORDER BY
             user_id) AS t2 ON t1.user_id = t2.user_id;`,
-      [userId],
+      [uid],
       (error, row) => {
         if (error) {
           throw error;
@@ -57,7 +57,7 @@ const getUserByUserId = async (userId) => {
   return user;
 };
 
-const getAllRecordsByUserId = async (userId) => {
+const getAllRecordsByUserId = async (uid) => {
   var records = new Promise((resolve, reject) => {
     db.all(
       `
@@ -65,10 +65,10 @@ const getAllRecordsByUserId = async (userId) => {
         step_data
       WHERE
         step_data.user_id = (
-          SELECT user_id FROM users
-          WHERE user_id = ?
+          SELECT uid FROM users
+          WHERE uid = ?
           LIMIT 1);`,
-      [userId],
+      [uid],
       (err, rows) => {
         if (err) {
           throw err;
@@ -84,7 +84,7 @@ const getAllRecordsByUserId = async (userId) => {
   return records;
 };
 
-const getTotalStepsLastSevenDays = async (userId) => {
+const getTotalStepsLastSevenDays = async (uid) => {
   var totalSteps = new Promise((resolve, reject) => {
     db.get(
       `SELECT user_id, SUM(step_count) as total_step 
@@ -92,11 +92,11 @@ const getTotalStepsLastSevenDays = async (userId) => {
       WHERE
         record_date >= (SELECT DATETIME ('now', '-7 day'))
       AND user_id =  (
-        SELECT user_id FROM users
-        WHERE user_id = ?
+        SELECT uid FROM users
+        WHERE uid = ?
         LIMIT 1
         );`,
-      [userId],
+      [uid],
       (err, rows) => {
         if (err) {
           throw err;
@@ -168,13 +168,13 @@ const createNewUser = async (user) => {
   return results;
 };
 
-const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
+const getRecordsByUidAndStartDate = async (uid, startDate) => {
   var results = new Promise((resolve, reject) => {
     db.all(
       `SELECT * FROM step_data s
       WHERE user_id = ?
       AND s.record_date >= ?;`,
-      [userId, startDate],
+      [uid, startDate],
       (err, rows) => {
         if (err) reject(err);
         resolve(rows);
@@ -184,13 +184,13 @@ const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
   return results;
 };
 
-const updateTeamIdForUserId = async (userId, teamdId) => {
+const updateTeamIdForUid = async (uid, teamId) => {
   var results = new Promise((resolve, reject) => {
     db.run(
       `UPDATE users
       SET team_id= ?
-      WHERE user_id= ?;`,
-      [teamdId, userId],
+      WHERE uid= ?;`,
+      [teamId, uid],
       function (err, row) {
         if (err) reject(err);
         resolve(row);
@@ -208,6 +208,6 @@ module.exports = {
   userIdExisted,
   getUserLogin,
   createNewUser,
-  getRecordsByUserIdAndStartDate,
-  updateTeamIdForUserId,
+  getRecordsByUidAndStartDate,
+  updateTeamIdForUid,
 };
