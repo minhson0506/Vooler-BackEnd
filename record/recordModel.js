@@ -16,7 +16,7 @@ const checkExistingEntryForDate = async (date, uid) => {
     var results = new Promise((resolve, reject) => {
       db.all(query, [date, uid], (err, rows) => {
         if (err) {
-          throw err;
+          reject(err);
         }
         rows.forEach((row) => {
           console.log(row.user_id);
@@ -42,11 +42,11 @@ const createNewRecord = async (uid, record) => {
         function (err) {
           if (err) reject(err);
           resolve({
-            succesfully_saved: true,
+            status: "created",
             saved_timestamp: new Date(),
             record_id: this.lastID,
-            user_id: record.user_id,
-            record_date: record.record_date,
+            uid: uid,
+            record_date: record.recordDate,
           });
         }
       );
@@ -57,7 +57,50 @@ const createNewRecord = async (uid, record) => {
   }
 };
 
+const updateRecord = async (uid, record) => {
+  console.log(
+    "update db",
+    record.stepCount,
+    record.recordDate,
+    uid,
+    record.recordDate
+  );
+  const query = `
+    UPDATE
+    step_data
+    SET
+      step_count = ?,
+      record_date = ?
+    WHERE
+      user_id = ?
+      AND(
+      SELECT
+        date(record_date)) = (
+      SELECT
+        date(?));`;
+  var results = new Promise((resolve, reject) => {
+    db.run(
+      query,
+      [record.stepCount, record.recordDate, uid, record.recordDate],
+      function (err) {
+        if (err) {
+          reject(err);
+        }
+        resolve({
+          status: "updated",
+          saved_timestamp: new Date(),
+          uid: uid,
+          record_date: record.recordDate,
+        });
+      }
+    );
+  });
+  console.log("ret in model", results);
+  return results;
+};
+
 module.exports = {
   createNewRecord,
   checkExistingEntryForDate,
+  updateRecord,
 };
