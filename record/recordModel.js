@@ -3,17 +3,42 @@ const { createDbConnection } = require("../db");
 
 let db = createDbConnection();
 
-// TODO: check if we need the function to create new team
-// const createNewTeam = async (team) => {};
+const checkExistingEntryForDate = async (date, uid) => {
+  const query = `
+  SELECT * FROM step_data
+  WHERE (
+    SELECT
+      date(record_date)) = (
+      SELECT
+        date(?))
+      AND user_id = ?;`;
+  try {
+    var results = new Promise((resolve, reject) => {
+      db.all(query, [date, uid], (err, rows) => {
+        if (err) {
+          throw err;
+        }
+        rows.forEach((row) => {
+          console.log(row.user_id);
+        });
+        resolve(rows);
+      });
+    });
+    console.log("ret in model", results);
+    return results;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-const createNewRecord = async (record) => {
+const createNewRecord = async (uid, record) => {
   try {
     var result = new Promise((resolve, reject) => {
       db.run(
         `INSERT INTO step_data
                 (user_id, step_count, record_date)
             VALUES (?, ?, ?)`,
-        [record.user_id, record.step_count, record.record_date],
+        [uid, record.stepCount, record.recordDate],
         function (err) {
           if (err) reject(err);
           resolve({
@@ -34,4 +59,5 @@ const createNewRecord = async (record) => {
 
 module.exports = {
   createNewRecord,
+  checkExistingEntryForDate,
 };
