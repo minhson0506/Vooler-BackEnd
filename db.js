@@ -87,7 +87,22 @@ const createTable = (newdb) => {
     VALUES
         ("Joe", 500, '2022-11-17 23:59:59'),
         ("Joe", 1234, '2022-11-18 23:59:59'),
-        ("Jane", 500, '2022-11-18 23:59:59');
+        ("Jane", 500, '2022-11-18 23:59:59'),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9u8ZrrbW5hMO01sm2ePJuVOB0rQExW03u",201,"2022-11-23 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9u3kaVruVTCBxWg.9KW5YYZwYVvJvZ2n6",250,"2022-11-23 21:33:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uo9voWMQbL.E.3XXZX/2ocNePqlsR3uO",300,"2022-11-22 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uWDR6BBOEKCV1zxSQ8J7Ld9Vy27SITp6",320,"2022-11-21 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9u67icCG4yG9gs9F6LFuKNvUgkFC6Bgwm",350,"2022-11-20 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9urxFo8Sbhofeu58D3oHJw2Z9cGUKOlbq",378,"2022-11-21 20:30:43"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uzpl8jKqiBj0bD9hWo4XqAywX2/95f0K",400,"2022-11-23 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9u3yp9i67IBUJWCIJjK2YnxV.FYI0tU3W",401,"2022-11-22 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uCunsYv2PAWAuWIIHcUJcBhxdUQb3O7O",480,"2022-11-21 20:30:43"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uol4ZqdOl5HEDp4TFpbhPWoZZmB92QtK",590,"2022-11-20 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uaPQwABQxLwS64ieD7ojYXKmAihVhR2O",354,"2022-11-23 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uryuwvIw..ZjdaJdYuCBpEr8yrecf8y6",125,"2022-11-22 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uKc0W24G6epVz5nwWCNgu9geOk/mzTIe",248,"2022-11-21 21:32:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9ub/5hs1D8V9EHJmUnEwGUlWX5mflzQJe",453,"2022-11-20 21:20:59"),
+        ("$2a$12$3TNWLZkSAp1FgvpfGJOg9uE7/zrqK/kW3teUhgR7LhoLIHziKlXYW",358,"2022-11-21 20:30:43");
     `
   );
 };
