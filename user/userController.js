@@ -15,6 +15,8 @@ const processUserData = (userDataObject, withEndDate) => {
   returnObject.records = userDataObject.map((t) => {
     delete t.team_id;
     delete t.uid;
+    delete t.start_date;
+    delete t.end_date;
     return t;
   });
   return returnObject;

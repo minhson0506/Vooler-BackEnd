@@ -3,11 +3,6 @@ require("dotenv").config();
 const model = require("./teamModel");
 const { getPreviousSundayDateString } = require("../utils/utils");
 
-const getAllTeams = async (req, res) => {
-  const teams = await model.getAllTeams();
-  res.json(teams);
-};
-
 const processTeamData = (teamDataObject, withEndDate) => {
   var returnObject = {};
   returnObject.team_name = teamDataObject.map((t) => t.team_name)[0];
@@ -29,6 +24,29 @@ const processTeamData = (teamDataObject, withEndDate) => {
     return t;
   });
   return returnObject;
+};
+
+const getAllTeams = async (req, res) => {
+  const teams = await model.getAllTeams();
+  res.json(teams);
+};
+
+const getAllTeamsStepDataWithEndDate = async (req, res, next) => {
+  try {
+    const teams = await model.getAllTeamsStepDataWithEndDate(req.query.endDate);
+    var returnObject = {};
+    returnObject.start_date = teams.map((t) => t.start_date)[0];
+    returnObject.end_date = teams.map((t) => t.end_date)[0];
+    returnObject.teams = teams.map((t) => {
+      delete t.start_date;
+      delete t.end_date;
+      return t;
+    });
+    console.log("returnObject", returnObject);
+    res.json(returnObject);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 };
 
 const getTeamMembersByTeamId = async (req, res, next) => {
@@ -65,4 +83,5 @@ module.exports = {
   getAllTeams,
   getTeamMembersByTeamId,
   getTeamInfoWithEndDate,
+  getAllTeamsStepDataWithEndDate,
 };

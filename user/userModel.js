@@ -84,32 +84,6 @@ const getAllRecordsByUserId = async (uid) => {
   return records;
 };
 
-// const getTotalStepsLastSevenDays = async (uid) => {
-//   var totalSteps = new Promise((resolve, reject) => {
-//     db.get(
-//       `SELECT user_id, SUM(step_count) as total_step
-//       FROM step_data
-//       WHERE
-//         record_date >= (SELECT DATETIME ('now', '-7 day'))
-//       AND user_id =  (
-//         SELECT uid FROM users
-//         WHERE uid = ?
-//         LIMIT 1
-//         );`,
-//       [uid],
-//       (err, rows) => {
-//         if (err) {
-//           throw err;
-//         }
-//         console.log("result in model", rows);
-//         resolve(rows);
-//       }
-//     );
-//   });
-//   console.log("total step", totalSteps);
-//   return totalSteps;
-// };
-
 const userIdExisted = async (userId) => {
   try {
     var results = new Promise((resolve, reject) => {
@@ -232,7 +206,6 @@ module.exports = {
   getUserByUserId,
   getAllUsers,
   getAllRecordsByUserId,
-  // getTotalStepsLastSevenDays,
   userIdExisted,
   getUserLogin,
   createNewUser,

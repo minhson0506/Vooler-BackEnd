@@ -8,7 +8,8 @@ var middleware = (req, res, next) => {
     return controller.getTeamMembersByTeamId(req, res, next);
   else if (req.query.teamId && req.query.endDate)
     return controller.getTeamInfoWithEndDate(req, res, next);
-
+  else if (!req.query.teamId && req.query.endDate)
+    return controller.getAllTeamsStepDataWithEndDate(req, res, next);
   return next();
 };
 
