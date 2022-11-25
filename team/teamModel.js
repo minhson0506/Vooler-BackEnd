@@ -28,7 +28,7 @@ const teamInfoQuery = (dateCondition, stepColumnName) => {
       *
     FROM (
       SELECT
-        u.user_id,
+        u.uid,
         t.team_id,
         team_name
       FROM
@@ -45,7 +45,7 @@ const teamInfoQuery = (dateCondition, stepColumnName) => {
         WHERE
           record_date >= ${dateCondition}
           GROUP BY
-            user_id) AS t2 ON t1.user_id = t2.step_userId;`;
+            user_id) AS t2 ON t1.uid = t2.step_userId;`;
   return sqlString;
 };
 

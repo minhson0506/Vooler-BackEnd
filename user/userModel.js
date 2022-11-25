@@ -24,32 +24,18 @@ const getUserByUserId = async (uid) => {
   var user = new Promise((resolve, reject) => {
     db.get(
       `SELECT
-      t1.uid, team_id, total_step_last_7_days
-    FROM (
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        uid = ?) AS t1
-      LEFT JOIN (
-        SELECT
-          user_id, sum(step_count) as total_step_last_7_days
-        FROM
-          step_data
-        WHERE
-          record_date >= (
-            SELECT
-              DATETIME ('now', '-7 day'))
-          ORDER BY
-            user_id) AS t2 ON t1.user_id = t2.user_id;`,
+        uid,
+        user_id,
+        team_id
+      FROM users
+      WHERE uid=? ;`,
       [uid],
-      (error, row) => {
+      (error, rows) => {
         if (error) {
-          throw error;
+          reject(error);
         }
-        console.log("result in model", row);
-        resolve(row);
+        console.log("result in model", rows);
+        resolve(rows);
       }
     );
   });
@@ -60,22 +46,36 @@ const getUserByUserId = async (uid) => {
 const getAllRecordsByUserId = async (uid) => {
   var records = new Promise((resolve, reject) => {
     db.all(
-      `
-      SELECT * FROM
-        step_data
-      WHERE
-        step_data.user_id = (
-          SELECT uid FROM users
-          WHERE uid = ?
-          LIMIT 1);`,
-      [uid],
+      `SELECT
+        uid,
+        team_id,
+        record_date,
+        step_count_for_date
+      FROM (
+        SELECT
+          *
+        FROM
+          users
+        WHERE
+          uid = ?) AS t1
+        LEFT JOIN (
+          SELECT
+            user_id, sum(step_count) AS step_count_for_date, (
+              SELECT
+                date(record_date)) AS record_date
+            FROM
+              step_data
+            WHERE
+              user_id = ?
+            GROUP BY
+              user_id,
+              record_date) AS t2 
+        ON t1.uid = t2.user_id;`,
+      [uid, uid],
       (err, rows) => {
         if (err) {
-          throw err;
+          reject(err);
         }
-        // rows.forEach((row) => {
-        //   console.log(row.userId);
-        // });
         resolve(rows);
       }
     );
@@ -84,31 +84,31 @@ const getAllRecordsByUserId = async (uid) => {
   return records;
 };
 
-const getTotalStepsLastSevenDays = async (uid) => {
-  var totalSteps = new Promise((resolve, reject) => {
-    db.get(
-      `SELECT user_id, SUM(step_count) as total_step 
-      FROM step_data
-      WHERE
-        record_date >= (SELECT DATETIME ('now', '-7 day'))
-      AND user_id =  (
-        SELECT uid FROM users
-        WHERE uid = ?
-        LIMIT 1
-        );`,
-      [uid],
-      (err, rows) => {
-        if (err) {
-          throw err;
-        }
-        console.log("result in model", rows);
-        resolve(rows);
-      }
-    );
-  });
-  console.log("total step", totalSteps);
-  return totalSteps;
-};
+// const getTotalStepsLastSevenDays = async (uid) => {
+//   var totalSteps = new Promise((resolve, reject) => {
+//     db.get(
+//       `SELECT user_id, SUM(step_count) as total_step
+//       FROM step_data
+//       WHERE
+//         record_date >= (SELECT DATETIME ('now', '-7 day'))
+//       AND user_id =  (
+//         SELECT uid FROM users
+//         WHERE uid = ?
+//         LIMIT 1
+//         );`,
+//       [uid],
+//       (err, rows) => {
+//         if (err) {
+//           throw err;
+//         }
+//         console.log("result in model", rows);
+//         resolve(rows);
+//       }
+//     );
+//   });
+//   console.log("total step", totalSteps);
+//   return totalSteps;
+// };
 
 const userIdExisted = async (userId) => {
   try {
@@ -204,7 +204,7 @@ module.exports = {
   getUserByUserId,
   getAllUsers,
   getAllRecordsByUserId,
-  getTotalStepsLastSevenDays,
+  // getTotalStepsLastSevenDays,
   userIdExisted,
   getUserLogin,
   createNewUser,

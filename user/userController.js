@@ -3,6 +3,19 @@ require("dotenv").config();
 const fetchModel = require("./userModel");
 const jwt = require("jsonwebtoken");
 
+const processUserData = (userDataObject) => {
+  var returnObject = {};
+  returnObject.uid = userDataObject.map((t) => t.uid)[0];
+  returnObject.team_id = userDataObject.map((t) => t.team_id)[0];
+
+  returnObject.records = userDataObject.map((t) => {
+    delete t.team_id;
+    delete t.uid;
+    return t;
+  });
+  return returnObject;
+};
+
 // USER DATA
 const userGetById = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
@@ -34,8 +47,9 @@ const userGetAllRecords = async (req, res) => {
     uid = decoded.uid;
   });
   const records = await fetchModel.getAllRecordsByUserId(uid);
+  const processedUserDTO = processUserData(records);
   console.log("user records", records);
-  res.json(records);
+  res.json(processedUserDTO);
 };
 
 const userGetRecordFromDate = async (req, res) => {

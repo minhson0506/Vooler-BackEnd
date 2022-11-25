@@ -25,6 +25,7 @@ const processTeamData = (teamDataObject, withEndDate) => {
     delete t.team_id;
     delete t.team_name;
     delete t.step_userId;
+    delete t.user_id;
     return t;
   });
   return returnObject;
