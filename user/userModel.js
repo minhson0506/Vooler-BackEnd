@@ -168,18 +168,46 @@ const createNewUser = async (user) => {
   return results;
 };
 
-const getRecordsByUidAndStartDate = async (uid, startDate) => {
+const getRecordsByUidWithEndDate = async (uid, endDate) => {
+  const query = `
+      SELECT
+      uid,
+      team_id,
+      record_date,
+      step_count_for_date,
+      (SELECT DATE(?, '-7 day', 'weekday 0')) as start_date,
+      (SELECT DATE(?)) as end_date 
+    FROM (
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        uid = ?) AS t1
+      LEFT JOIN (
+        SELECT
+          user_id, sum(step_count) AS step_count_for_date, (
+            SELECT
+              date(record_date)) AS record_date
+          FROM
+            step_data
+          WHERE
+            user_id = 1
+            AND record_date >= (
+              SELECT
+                DATE(?, '-7 day', 'weekday 0'))
+              AND record_date < (
+                SELECT
+                  (DATE(?, '+1 day')))
+          GROUP BY
+            user_id,
+            record_date) AS t2 
+      ON t1.uid = t2.user_id;`;
   var results = new Promise((resolve, reject) => {
-    db.all(
-      `SELECT * FROM step_data s
-      WHERE user_id = ?
-      AND s.record_date >= ?;`,
-      [uid, startDate],
-      (err, rows) => {
-        if (err) reject(err);
-        resolve(rows);
-      }
-    );
+    db.all(query, [endDate, endDate, uid, endDate, endDate], (err, rows) => {
+      if (err) reject(err);
+      resolve(rows);
+    });
   });
   return results;
 };
@@ -208,6 +236,6 @@ module.exports = {
   userIdExisted,
   getUserLogin,
   createNewUser,
-  getRecordsByUidAndStartDate,
+  getRecordsByUidWithEndDate,
   updateTeamIdForUid,
 };

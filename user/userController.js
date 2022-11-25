@@ -3,11 +3,15 @@ require("dotenv").config();
 const fetchModel = require("./userModel");
 const jwt = require("jsonwebtoken");
 
-const processUserData = (userDataObject) => {
+const processUserData = (userDataObject, withEndDate) => {
   var returnObject = {};
   returnObject.uid = userDataObject.map((t) => t.uid)[0];
   returnObject.team_id = userDataObject.map((t) => t.team_id)[0];
 
+  if (withEndDate) {
+    returnObject.start_date = userDataObject.map((t) => t.start_date)[0];
+    returnObject.end_date = userDataObject.map((t) => t.end_date)[0];
+  }
   returnObject.records = userDataObject.map((t) => {
     delete t.team_id;
     delete t.uid;
@@ -47,23 +51,24 @@ const userGetAllRecords = async (req, res) => {
     uid = decoded.uid;
   });
   const records = await fetchModel.getAllRecordsByUserId(uid);
-  const processedUserDTO = processUserData(records);
+  const processedUserDTO = processUserData(records, false);
   console.log("user records", records);
   res.json(processedUserDTO);
 };
 
-const userGetRecordFromDate = async (req, res) => {
+const userGetRecordFromLastSundayToDate = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   var uid;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
-  const records = await fetchModel.getRecordsByUidAndStartDate(
+  const records = await fetchModel.getRecordsByUidWithEndDate(
     uid,
-    req.query.startDate
+    req.query.endDate
   );
-  res.json(records);
+  const processedUserDTO = processUserData(records, true);
+  res.json(processedUserDTO);
 };
 
 const userEditTeamId = async (req, res, next) => {
@@ -91,6 +96,6 @@ module.exports = {
   userGetById,
   userGetAll,
   userGetAllRecords,
-  userGetRecordFromDate,
+  userGetRecordFromLastSundayToDate,
   userEditTeamId,
 };

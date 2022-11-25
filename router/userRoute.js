@@ -4,8 +4,8 @@ const controller = require("../user/userController");
 
 var middleware = (req, res, next) => {
   if (req.path == "/records") {
-    if (req.query.startDate) {
-      return controller.userGetRecordFromDate(req, res);
+    if (req.query.endDate) {
+      return controller.userGetRecordFromLastSundayToDate(req, res);
     } else return controller.userGetAllRecords(req, res);
   }
   return next();
