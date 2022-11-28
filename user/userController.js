@@ -31,6 +31,7 @@ const userGetById = async (req, res) => {
     uid = decoded.uid;
   });
   const user = await fetchModel.getUserByUserId(uid);
+  delete user.password;
   console.log("result in controller", user);
   res.json(user);
 };
@@ -73,7 +74,7 @@ const userGetRecordFromLastSundayToDate = async (req, res) => {
   res.json(processedUserDTO);
 };
 
-const userEditTeamId = async (req, res, next) => {
+const userEditInfo = async (req, res, next) => {
   var uid;
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -84,12 +85,25 @@ const userEditTeamId = async (req, res, next) => {
   } catch (e) {
     res.status(400).json({ error: "authentication failed" });
   }
+
+  const originalUser = await fetchModel.getUserByUserId(uid);
+  console.log("originalUser", originalUser);
+
+  var editedUser = {};
+  editedUser.uid = uid;
+  editedUser.userId = req.body.userId ? req.body.userId : originalUser.user_id;
+  editedUser.password = req.body.password
+    ? req.body.password
+    : originalUser.password;
+  editedUser.teamId = req.body.teamId ? req.body.teamId : originalUser.team_id;
+  console.log("editedUser", editedUser);
+
   try {
-    await fetchModel.updateTeamIdForUid(req.query.userId, req.body.teamId);
-    res.status(200).json({ message: "updated teamID" });
+    await fetchModel.updateUserInfo(editedUser, uid);
+    res.status(200).json({ message: "updated userInfo" });
   } catch (e) {
-    console.log("edit team id for user error", e.message);
-    res.status(400).json({ error: "cannot edit teamId, recheck teamId" });
+    console.log("edit info for user error", e.message);
+    res.status(400).json({ error: "cannot update, recheck input" });
     return;
   }
 };
@@ -99,5 +113,5 @@ module.exports = {
   userGetAll,
   userGetAllRecords,
   userGetRecordFromLastSundayToDate,
-  userEditTeamId,
+  userEditInfo,
 };

@@ -15,6 +15,6 @@ router.get("/", middleware);
 router.get("/info", controller.userGetById);
 router.get("/all", controller.userGetAll);
 router.get("/records", middleware);
-router.put("/", controller.userEditTeamId);
+router.put("/", controller.userEditInfo);
 
 module.exports = router;

@@ -26,6 +26,7 @@ const getUserByUserId = async (uid) => {
       `SELECT
         uid,
         user_id,
+        password,
         team_id
       FROM users
       WHERE uid=? ;`,
@@ -186,13 +187,15 @@ const getRecordsByUidWithEndDate = async (uid, endDate) => {
   return results;
 };
 
-const updateTeamIdForUid = async (uid, teamId) => {
+const updateUserInfo = (user, uid) => {
+  const query = `UPDATE users
+    SET user_id=?, password=?, team_id=?
+    WHERE uid=?;
+    `;
   var results = new Promise((resolve, reject) => {
     db.run(
-      `UPDATE users
-      SET team_id= ?
-      WHERE uid= ?;`,
-      [teamId, uid],
+      query,
+      [user.userId, user.password, user.teamId, uid],
       function (err, row) {
         if (err) reject(err);
         resolve(row);
@@ -210,5 +213,5 @@ module.exports = {
   getUserLogin,
   createNewUser,
   getRecordsByUidWithEndDate,
-  updateTeamIdForUid,
+  updateUserInfo,
 };
