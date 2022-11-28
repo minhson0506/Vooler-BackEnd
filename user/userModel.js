@@ -145,44 +145,63 @@ const createNewUser = async (user) => {
 
 const getRecordsByUidWithEndDate = async (uid, endDate) => {
   const query = `
-      SELECT
-      uid,
-      team_id,
-      record_date,
-      step_count_for_date,
-      (SELECT DATE(?, '-7 day', 'weekday 0')) as start_date,
-      (SELECT DATE(?)) as end_date 
-    FROM (
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        uid = ?) AS t1
-      LEFT JOIN (
-        SELECT
-          user_id, sum(step_count) AS step_count_for_date, (
-            SELECT
-              date(record_date)) AS record_date
-          FROM
-            step_data
-          WHERE
-            user_id = 1
-            AND record_date >= (
-              SELECT
-                DATE(?, '-7 day', 'weekday 0'))
-              AND record_date < (
-                SELECT
-                  (DATE(?, '+1 day')))
-          GROUP BY
-            user_id,
-            record_date) AS t2 
-      ON t1.uid = t2.user_id;`;
+  SELECT
+	uid,
+	team_id,
+	record_date,
+	step_count_for_date,
+	(
+		SELECT
+      (CASE WHEN strftime ('%w',?) IN ('0') 
+      THEN
+				(SELECT DATE(?))
+			ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		  END)) AS start_date,
+		(
+			SELECT DATE(?)) AS end_date
+		FROM (
+			SELECT * FROM users WHERE uid = 1) AS t1
+	LEFT JOIN (
+		SELECT
+			user_id, sum(step_count) AS step_count_for_date, (
+				SELECT
+					date(record_date)) AS record_date
+			FROM
+				step_data
+			WHERE
+				user_id = ?
+				AND record_date >= (
+					SELECT
+						(CASE WHEN strftime ('%w', ?) in('0') 
+              THEN (SELECT DATE(?))
+							ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+							END)
+          )
+					AND record_date < (SELECT (DATE(?, '+1 day')))
+      GROUP BY 
+        user_id,
+        record_date) AS t2 
+    ON t1.uid = t2.user_id;
+  `;
   var results = new Promise((resolve, reject) => {
-    db.all(query, [endDate, endDate, uid, endDate, endDate], (err, rows) => {
-      if (err) reject(err);
-      resolve(rows);
-    });
+    db.all(
+      query,
+      [
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+        uid,
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+      ],
+      (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      }
+    );
   });
   return results;
 };

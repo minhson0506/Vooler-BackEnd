@@ -19,6 +19,9 @@ const processUserData = (userDataObject, withEndDate) => {
     delete t.end_date;
     return t;
   });
+  returnObject.total_steps_accumulated = returnObject.records
+    .map((t) => t.step_count_for_date)
+    .reduce((a, b) => a + b, 0);
   return returnObject;
 };
 
