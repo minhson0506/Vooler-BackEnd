@@ -29,7 +29,12 @@ const getAllTeamsStepDataWithEndDate = (endDate) => {
     team_id,
     team_name,
     sum(total_steps_accumulated) as total_team_steps_accumulated,
-    (SELECT DATE(?, '-7 day', 'weekday 0')) as start_date,
+    (SELECT
+      (CASE WHEN strftime ('%w',?) IN ('0') 
+      THEN
+				(SELECT DATE(?))
+			ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		  END)) AS start_date,
     (SELECT DATE(? )) as end_date 
   FROM (
     SELECT
@@ -48,8 +53,12 @@ const getAllTeamsStepDataWithEndDate = (endDate) => {
         step_data
       WHERE
         record_date >= (
-          SELECT
-            DATE(?, '-7 day', 'weekday 0'))
+					SELECT
+						(CASE WHEN strftime ('%w', ?) in('0') 
+              THEN (SELECT DATE(?))
+							ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+							END)
+          )
           AND record_date < (
             SELECT
               (DATE(?, '+1 day')))
@@ -59,12 +68,16 @@ const getAllTeamsStepDataWithEndDate = (endDate) => {
   GROUP BY
     team_id;`;
   var team = new Promise((resolve, reject) => {
-    db.all(query, [endDate, endDate, endDate, endDate], (error, rows) => {
-      if (error) {
-        throw error;
+    db.all(
+      query,
+      [endDate, endDate, endDate, endDate, endDate, endDate, endDate, endDate],
+      (error, rows) => {
+        if (error) {
+          throw error;
+        }
+        resolve(rows);
       }
-      resolve(rows);
-    });
+    );
   });
   console.log("result in model", team);
 

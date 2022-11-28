@@ -150,8 +150,7 @@ const getRecordsByUidWithEndDate = async (uid, endDate) => {
 	team_id,
 	record_date,
 	step_count_for_date,
-	(
-		SELECT
+	(SELECT
       (CASE WHEN strftime ('%w',?) IN ('0') 
       THEN
 				(SELECT DATE(?))
