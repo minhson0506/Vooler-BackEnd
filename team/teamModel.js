@@ -150,18 +150,28 @@ const getTeamInfoWithEndDate = async (teamId, endDate) => {
         FROM
           step_data
         WHERE
-          record_date >= (SELECT DATE(?, '-7 day', 'weekday 0'))
+          record_date >= (
+            SELECT
+              (CASE WHEN strftime ('%w', ?) in('0') 
+                THEN (SELECT DATE(?))
+                ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+                END)
+            )
             AND record_date < (SELECT(DATE(?,'+1 day')))
         GROUP BY
             user_id) AS t2 ON t1.uid = t2.user_id;
   `;
   var team = new Promise((resolve, reject) => {
-    db.all(query, [teamId, endDate, endDate], (error, rows) => {
-      if (error) {
-        throw error;
+    db.all(
+      query,
+      [teamId, endDate, endDate, endDate, endDate],
+      (error, rows) => {
+        if (error) {
+          throw error;
+        }
+        resolve(rows);
       }
-      resolve(rows);
-    });
+    );
   });
   console.log("result in model", team);
 
