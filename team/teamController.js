@@ -1,13 +1,14 @@
 "use strict";
 require("dotenv").config();
 const model = require("./teamModel");
-const { getPreviousSundayDateString } = require("../utils/utils");
 
 const processTeamData = (teamDataObject, withEndDate) => {
   var returnObject = {};
   returnObject.team_name = teamDataObject.map((t) => t.team_name)[0];
   returnObject.team_id = teamDataObject.map((t) => t.team_id)[0];
   if (withEndDate) {
+    returnObject.start_date = teamDataObject.map((t) => t.start_date)[0];
+    returnObject.end_date = teamDataObject.map((t) => t.end_date)[0];
     returnObject.total_team_steps_accumulated = teamDataObject
       .map((t) => t.total_steps_accumulated)
       .reduce((a, b) => a + b, 0);
@@ -21,6 +22,10 @@ const processTeamData = (teamDataObject, withEndDate) => {
     delete t.team_name;
     delete t.step_userId;
     delete t.user_id;
+    if (withEndDate) {
+      delete t.start_date;
+      delete t.end_date;
+    }
     return t;
   });
   return returnObject;
@@ -65,15 +70,12 @@ const getTeamInfoWithEndDate = async (req, res, next) => {
     req.query.teamId,
     req.query.endDate
   );
+  console.log("team info: ", teamMembers);
   if (teamMembers.length === 0) {
     res.status(400).json({ error: "invalid teamId" });
     return;
   }
   const returnObject = processTeamData(teamMembers, true);
-  returnObject.start_date = getPreviousSundayDateString(
-    new Date(req.query.endDate)
-  );
-  returnObject.end_date = req.query.endDate;
 
   console.log("result in controller", returnObject);
   res.json(returnObject);

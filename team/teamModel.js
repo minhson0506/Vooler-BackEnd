@@ -46,7 +46,7 @@ const getAllTeamsStepDataWithEndDate = (endDate) => {
     LEFT JOIN teams t
   WHERE
     u.team_id = t.team_id) AS t1
-    JOIN (
+    LEFT JOIN (
       SELECT
         user_id, SUM(step_count) AS total_steps_accumulated
       FROM
@@ -131,50 +131,64 @@ const getTeamInfoByTeamId = async (teamId) => {
 
 const getTeamInfoWithEndDate = async (teamId, endDate) => {
   const query = `
-      SELECT
-      *
-    FROM (
-      SELECT
-        uid,
-        u.team_id,
-        team_name
-      FROM
-        users u
-      LEFT JOIN teams t
-    WHERE
-      u.team_id = t.team_id
-      AND t.team_id = ?) AS t1
-      JOIN (
-        SELECT
-          user_id, SUM(step_count) AS total_steps_accumulated
-        FROM
-          step_data
-        WHERE
-          record_date >= (
-            SELECT
-              (CASE WHEN strftime ('%w', ?) in('0') 
-                THEN (SELECT DATE(?))
-                ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
-                END)
-            )
-            AND record_date < (SELECT(DATE(?,'+1 day')))
-        GROUP BY
-            user_id) AS t2 ON t1.uid = t2.user_id;
+  SELECT
+	*, 
+	(SELECT
+		(CASE WHEN strftime ('%w', ?) IN ('0') 
+		THEN (SELECT DATE(?))
+		ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		END)) AS start_date,
+	(SELECT DATE(? )) as end_date 
+FROM (
+	SELECT
+		uid,
+		u.team_id,
+		team_name
+	FROM
+		users u
+	LEFT JOIN teams t
+WHERE
+	u.team_id = t.team_id
+	AND t.team_id = ?) AS t1
+	LEFT JOIN (
+		SELECT
+			user_id, SUM(step_count) AS total_steps_accumulated
+		FROM
+			step_data
+		WHERE
+			record_date >= (
+					SELECT
+						(CASE WHEN strftime ('%w', ?) IN ('0') 
+						THEN (SELECT DATE(?))
+						ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+						END))
+    		AND record_date < (SELECT(DATE(?,'+1 day')))
+		GROUP BY
+				user_id) AS t2 ON t1.uid = t2.user_id;
   `;
   var team = new Promise((resolve, reject) => {
     db.all(
       query,
-      [teamId, endDate, endDate, endDate, endDate],
-      (error, rows) => {
+      [
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+        teamId,
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+      ],
+      function (error, rows) {
         if (error) {
-          throw error;
+          reject(error);
         }
         resolve(rows);
       }
     );
   });
   console.log("result in model", team);
-
   return team;
 };
 
