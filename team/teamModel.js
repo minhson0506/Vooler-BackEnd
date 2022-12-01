@@ -23,12 +23,73 @@ const getAllTeams = async () => {
   }
 };
 
+const getAllTeamsStepDataWithEndDate = (endDate) => {
+  const query = `
+    SELECT
+    team_id,
+    team_name,
+    sum(total_steps_accumulated) as total_team_steps_accumulated,
+    (SELECT
+      (CASE WHEN strftime ('%w',?) IN ('0') 
+      THEN
+				(SELECT DATE(?))
+			ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		  END)) AS start_date,
+    (SELECT DATE(? )) as end_date 
+  FROM (
+    SELECT
+      uid,
+      u.team_id,
+      team_name
+    FROM
+      users u
+    LEFT JOIN teams t
+  WHERE
+    u.team_id = t.team_id) AS t1
+    LEFT JOIN (
+      SELECT
+        user_id, SUM(step_count) AS total_steps_accumulated
+      FROM
+        step_data
+      WHERE
+        record_date >= (
+					SELECT
+						(CASE WHEN strftime ('%w', ?) in('0') 
+              THEN (SELECT DATE(?))
+							ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+							END)
+          )
+          AND record_date < (
+            SELECT
+              (DATE(?, '+1 day')))
+          GROUP BY
+            user_id) AS t2 
+    ON t1.uid = t2.user_id
+  GROUP BY
+    team_id;`;
+  var team = new Promise((resolve, reject) => {
+    db.all(
+      query,
+      [endDate, endDate, endDate, endDate, endDate, endDate, endDate, endDate],
+      (error, rows) => {
+        if (error) {
+          throw error;
+        }
+        resolve(rows);
+      }
+    );
+  });
+  console.log("result in model", team);
+
+  return team;
+};
+
 const teamInfoQuery = (dateCondition, stepColumnName) => {
   const sqlString = `SELECT
       *
     FROM (
       SELECT
-        u.user_id,
+        u.uid,
         t.team_id,
         team_name
       FROM
@@ -45,7 +106,7 @@ const teamInfoQuery = (dateCondition, stepColumnName) => {
         WHERE
           record_date >= ${dateCondition}
           GROUP BY
-            user_id) AS t2 ON t1.user_id = t2.step_userId;`;
+            user_id) AS t2 ON t1.uid = t2.step_userId;`;
   return sqlString;
 };
 
@@ -68,19 +129,72 @@ const getTeamInfoByTeamId = async (teamId) => {
   return team;
 };
 
-const getTeamInfoWithStartDate = async (teamId, startDate) => {
-  const query = teamInfoQuery("?", "total_step_from_startDate");
+const getTeamInfoWithEndDate = async (teamId, endDate) => {
+  const query = `
+  SELECT
+	*, 
+	(SELECT
+		(CASE WHEN strftime ('%w', ?) IN ('0') 
+		THEN (SELECT DATE(?))
+		ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		END)) AS start_date,
+	(SELECT DATE(? )) as end_date 
+FROM (
+	SELECT
+		uid,
+		u.team_id,
+		team_name
+	FROM
+		users u
+	LEFT JOIN teams t
+WHERE
+	u.team_id = t.team_id
+	AND t.team_id = ?) AS t1
+	LEFT JOIN (
+		SELECT
+			user_id, SUM(step_count) AS total_steps_accumulated
+		FROM
+			step_data
+		WHERE
+			record_date >= (
+					SELECT
+						(CASE WHEN strftime ('%w', ?) IN ('0') 
+						THEN (SELECT DATE(?))
+						ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+						END))
+    		AND record_date < (SELECT(DATE(?,'+1 day')))
+		GROUP BY
+				user_id) AS t2 ON t1.uid = t2.user_id;
+  `;
   var team = new Promise((resolve, reject) => {
-    db.all(query, [teamId, startDate], (error, rows) => {
-      if (error) {
-        throw error;
+    db.all(
+      query,
+      [
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+        teamId,
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+      ],
+      function (error, rows) {
+        if (error) {
+          reject(error);
+        }
+        resolve(rows);
       }
-      resolve(rows);
-    });
+    );
   });
   console.log("result in model", team);
-
   return team;
 };
 
-module.exports = { getAllTeams, getTeamInfoByTeamId, getTeamInfoWithStartDate };
+module.exports = {
+  getAllTeams,
+  getTeamInfoByTeamId,
+  getTeamInfoWithEndDate,
+  getAllTeamsStepDataWithEndDate,
+};

@@ -8,7 +8,6 @@ const userRouter = require("./router/userRoute");
 const teamRouter = require("./router/teamRoute");
 const recordRouter = require("./router/recordRoute");
 const authRouter = require("./router/authRoute");
-
 const fs = require("fs");
 
 // process.env.NODE_ENV = "production";
@@ -23,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.json({ message: "alive" }));
 app.use("/user", passport.authenticate("jwt", { session: false }), userRouter);
-app.use("/team", passport.authenticate("jwt", { session: false }), teamRouter);
+app.use("/team", teamRouter);
 app.use(
   "/record",
   passport.authenticate("jwt", { session: false }),

@@ -20,36 +20,23 @@ const getAllUsers = async () => {
   }
 };
 
-const getUserByUserId = async (userId) => {
+const getUserByUserId = async (uid) => {
   var user = new Promise((resolve, reject) => {
     db.get(
       `SELECT
-      t1.user_id, team_id, total_step_last_7_days
-    FROM (
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        user_id = ?) AS t1
-      LEFT JOIN (
-        SELECT
-          user_id, sum(step_count) as total_step_last_7_days
-        FROM
-          step_data
-        WHERE
-          record_date >= (
-            SELECT
-              DATETIME ('now', '-7 day'))
-          ORDER BY
-            user_id) AS t2 ON t1.user_id = t2.user_id;`,
-      [userId],
-      (error, row) => {
+        uid,
+        user_id,
+        password,
+        team_id
+      FROM users
+      WHERE uid=? ;`,
+      [uid],
+      (error, rows) => {
         if (error) {
-          throw error;
+          reject(error);
         }
-        console.log("result in model", row);
-        resolve(row);
+        console.log("result in model", rows);
+        resolve(rows);
       }
     );
   });
@@ -57,57 +44,45 @@ const getUserByUserId = async (userId) => {
   return user;
 };
 
-const getAllRecordsByUserId = async (userId) => {
+const getAllRecordsByUserId = async (uid) => {
   var records = new Promise((resolve, reject) => {
     db.all(
-      `
-      SELECT * FROM
-        step_data
-      WHERE
-        step_data.user_id = (
-          SELECT user_id FROM users
-          WHERE user_id = ?
-          LIMIT 1);`,
-      [userId],
+      `SELECT
+        uid,
+        team_id,
+        record_date,
+        step_count_for_date
+      FROM (
+        SELECT
+          *
+        FROM
+          users
+        WHERE
+          uid = ?) AS t1
+        LEFT JOIN (
+          SELECT
+            user_id, sum(step_count) AS step_count_for_date, (
+              SELECT
+                date(record_date)) AS record_date
+            FROM
+              step_data
+            WHERE
+              user_id = ?
+            GROUP BY
+              user_id,
+              record_date) AS t2 
+        ON t1.uid = t2.user_id;`,
+      [uid, uid],
       (err, rows) => {
         if (err) {
-          throw err;
+          reject(err);
         }
-        // rows.forEach((row) => {
-        //   console.log(row.userId);
-        // });
         resolve(rows);
       }
     );
   });
   console.log("records in model", records);
   return records;
-};
-
-const getTotalStepsLastSevenDays = async (userId) => {
-  var totalSteps = new Promise((resolve, reject) => {
-    db.get(
-      `SELECT user_id, SUM(step_count) as total_step 
-      FROM step_data
-      WHERE
-        record_date >= (SELECT DATETIME ('now', '-7 day'))
-      AND user_id =  (
-        SELECT user_id FROM users
-        WHERE user_id = ?
-        LIMIT 1
-        );`,
-      [userId],
-      (err, rows) => {
-        if (err) {
-          throw err;
-        }
-        console.log("result in model", rows);
-        resolve(rows);
-      }
-    );
-  });
-  console.log("total step", totalSteps);
-  return totalSteps;
 };
 
 const userIdExisted = async (userId) => {
@@ -159,7 +134,7 @@ const createNewUser = async (user) => {
       function (err) {
         if (err) reject(err);
         resolve({
-          row_added: this.lastID,
+          uid: this.lastID,
           user_id: user.user_id,
         });
       }
@@ -168,13 +143,60 @@ const createNewUser = async (user) => {
   return results;
 };
 
-const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
+const getRecordsByUidWithEndDate = async (uid, endDate) => {
+  const query = `
+  SELECT
+	uid,
+	team_id,
+	record_date,
+	step_count_for_date,
+	(SELECT
+      (CASE WHEN strftime ('%w',?) IN ('0') 
+      THEN
+				(SELECT DATE(?))
+			ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+		  END)) AS start_date,
+		(
+			SELECT DATE(?)) AS end_date
+		FROM (
+			SELECT * FROM users WHERE uid = ?) AS t1
+	LEFT JOIN (
+		SELECT
+			user_id, sum(step_count) AS step_count_for_date, (
+				SELECT
+					date(record_date)) AS record_date
+			FROM
+				step_data
+			WHERE
+				user_id = ?
+				AND record_date >= (
+					SELECT
+						(CASE WHEN strftime ('%w', ?) in('0') 
+              THEN (SELECT DATE(?))
+							ELSE (SELECT DATE(?, '-7 day', 'weekday 0'))
+							END)
+          )
+					AND record_date < (SELECT (DATE(?, '+1 day')))
+      GROUP BY 
+        user_id,
+        record_date) AS t2 
+    ON t1.uid = t2.user_id;
+  `;
   var results = new Promise((resolve, reject) => {
     db.all(
-      `SELECT * FROM step_data s
-      WHERE user_id = ?
-      AND s.record_date >= ?;`,
-      [userId, startDate],
+      query,
+      [
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+        uid,
+        uid,
+        endDate,
+        endDate,
+        endDate,
+        endDate,
+      ],
       (err, rows) => {
         if (err) reject(err);
         resolve(rows);
@@ -184,13 +206,15 @@ const getRecordsByUserIdAndStartDate = async (userId, startDate) => {
   return results;
 };
 
-const updateTeamIdForUserId = async (userId, teamdId) => {
+const updateUserInfo = (user, uid) => {
+  const query = `UPDATE users
+    SET user_id=?, password=?, team_id=?
+    WHERE uid=?;
+    `;
   var results = new Promise((resolve, reject) => {
     db.run(
-      `UPDATE users
-      SET team_id= ?
-      WHERE user_id= ?;`,
-      [teamdId, userId],
+      query,
+      [user.userId, user.password, user.teamId, uid],
       function (err, row) {
         if (err) reject(err);
         resolve(row);
@@ -204,10 +228,9 @@ module.exports = {
   getUserByUserId,
   getAllUsers,
   getAllRecordsByUserId,
-  getTotalStepsLastSevenDays,
   userIdExisted,
   getUserLogin,
   createNewUser,
-  getRecordsByUserIdAndStartDate,
-  updateTeamIdForUserId,
+  getRecordsByUidWithEndDate,
+  updateUserInfo,
 };

@@ -7,18 +7,28 @@ const bcrypt = require("bcryptjs");
 
 const { salt } = require("../salt");
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
+  // Check if user is existing:
+  const userIdExisted = await userModel.userIdExisted(req.body.userId);
+  console.log("existing username", userIdExisted);
+  if (userIdExisted.length === 0) {
+    res.status(404).json({ error: "user not found" });
+    return;
+  }
+  // If user is not existing, check if userId and password match:
   passport.authenticate("local", { session: false }, (err, user, info) => {
     console.log("local params", err, user, info);
     console.log("login req body", req.body);
     if (err || !user) {
-      next(httpError("Invalid login credentials", 401));
+      res.status(401).json({ error: "invalid login credentials" });
       return;
     }
+    delete user.user_id;
 
     req.login(user, { session: false }, (err) => {
       if (err) {
         next(httpError("login error", 400));
+        res.status(400).json({ error: "login failed" });
         return;
       }
       const token = jwt.sign(user, process.env.JWT_SECRET);
@@ -37,21 +47,17 @@ const registerUser = async (req, res, next) => {
     const userIdExisted = await userModel.userIdExisted(user.user_id);
     console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
-      const err = httpError(`UserID is taken!`, 403);
-      next(err);
+      res.status(403).json({ error: "userId is taken" });
       return;
     } else {
       const newUser = await userModel.createNewUser(user);
       console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
-      res.status(201).end();
+      res.status(201).json({ uid: newUser.uid });
+      return;
     }
   } catch (e) {
     console.log("register new user error", e.message);
-    const err = httpError(
-      `Error registering new user, recheck register info`,
-      400
-    );
-    next(err);
+    res.status(500).json({ error: "cannot register new user" });
     return;
   }
 };
