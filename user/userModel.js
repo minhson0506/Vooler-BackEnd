@@ -159,7 +159,7 @@ const getRecordsByUidWithEndDate = async (uid, endDate) => {
 		(
 			SELECT DATE(?)) AS end_date
 		FROM (
-			SELECT * FROM users WHERE uid = 1) AS t1
+			SELECT * FROM users WHERE uid = ?) AS t1
 	LEFT JOIN (
 		SELECT
 			user_id, sum(step_count) AS step_count_for_date, (
@@ -190,6 +190,7 @@ const getRecordsByUidWithEndDate = async (uid, endDate) => {
         endDate,
         endDate,
         endDate,
+        uid,
         uid,
         endDate,
         endDate,
