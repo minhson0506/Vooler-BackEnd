@@ -47,7 +47,6 @@ const getAllTeamsStepDataWithEndDate = async (req, res, next) => {
       delete t.end_date;
       return t;
     });
-    console.log("returnObject", returnObject);
     res.json(returnObject);
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -61,7 +60,6 @@ const getTeamMembersByTeamId = async (req, res, next) => {
     return;
   }
   const returnObject = processTeamData(teamMembers, false);
-  console.log("result in controller", returnObject);
   res.json(returnObject);
 };
 
@@ -70,14 +68,12 @@ const getTeamInfoWithEndDate = async (req, res, next) => {
     req.query.teamId,
     req.query.endDate
   );
-  console.log("team info: ", teamMembers);
   if (teamMembers.length === 0) {
     res.status(400).json({ error: "invalid teamId" });
     return;
   }
   const returnObject = processTeamData(teamMembers, true);
 
-  console.log("result in controller", returnObject);
   res.json(returnObject);
 };
 

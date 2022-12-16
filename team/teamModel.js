@@ -10,13 +10,9 @@ const getAllTeams = async () => {
         if (err) {
           throw err;
         }
-        rows.forEach((row) => {
-          console.log(row.team_name);
-        });
         resolve(rows);
       });
     });
-    console.log("ret in model", results);
     return results;
   } catch (e) {
     console.log(e);
@@ -79,7 +75,6 @@ const getAllTeamsStepDataWithEndDate = (endDate) => {
       }
     );
   });
-  console.log("result in model", team);
 
   return team;
 };
@@ -122,7 +117,6 @@ const getTeamInfoByTeamId = async (teamId) => {
       if (error) {
         throw error;
       }
-      console.log("result in model", rows);
       resolve(rows);
     });
   });
@@ -188,7 +182,6 @@ WHERE
       }
     );
   });
-  console.log("result in model", team);
   return team;
 };
 

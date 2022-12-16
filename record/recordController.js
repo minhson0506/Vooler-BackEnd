@@ -10,7 +10,6 @@ const postNewRecord = async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   var uid;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
 
@@ -30,7 +29,6 @@ const postNewRecord = async (req, res, next) => {
   if (existingEntryForDate.length !== 0) {
     try {
       const updatedRecord = await recordModel.updateRecord(uid, req.body);
-      console.log("updatedRecord", updatedRecord);
       res.json(updatedRecord);
     } catch (err) {
       res.status(500).json({ error: "cannot update day record" });

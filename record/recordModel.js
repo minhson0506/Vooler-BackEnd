@@ -18,13 +18,9 @@ const checkExistingEntryForDate = async (date, uid) => {
         if (err) {
           reject(err);
         }
-        rows.forEach((row) => {
-          console.log(row.user_id);
-        });
         resolve(rows);
       });
     });
-    console.log("ret in model", results);
     return results;
   } catch (e) {
     console.log(e);
@@ -95,7 +91,6 @@ const updateRecord = async (uid, record) => {
       }
     );
   });
-  console.log("ret in model", results);
   return results;
 };
 

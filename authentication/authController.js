@@ -10,15 +10,12 @@ const { salt } = require("../salt");
 const login = async (req, res, next) => {
   // Check if user is existing:
   const userIdExisted = await userModel.userIdExisted(req.body.userId);
-  console.log("existing username", userIdExisted);
   if (userIdExisted.length === 0) {
     res.status(404).json({ error: "user not found" });
     return;
   }
   // If user is not existing, check if userId and password match:
   passport.authenticate("local", { session: false }, (err, user, info) => {
-    console.log("local params", err, user, info);
-    console.log("login req body", req.body);
     if (err || !user) {
       res.status(401).json({ error: "invalid login credentials" });
       return;
@@ -45,13 +42,11 @@ const registerUser = async (req, res, next) => {
     user.team_id = req.body.teamId;
 
     const userIdExisted = await userModel.userIdExisted(user.user_id);
-    console.log("existing username", userIdExisted);
     if (userIdExisted.length !== 0) {
       res.status(403).json({ error: "userId is taken" });
       return;
     } else {
       const newUser = await userModel.createNewUser(user);
-      console.log("CREATE NEW USER RESULT IN AUTH ", newUser);
       res.status(201).json({ uid: newUser.uid });
       return;
     }

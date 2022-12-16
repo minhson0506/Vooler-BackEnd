@@ -13,7 +13,6 @@ const getAllUsers = async () => {
         resolve(rows);
       });
     });
-    console.log("ret in model", results);
     return results;
   } catch (e) {
     console.log(e);
@@ -35,12 +34,10 @@ const getUserByUserId = async (uid) => {
         if (error) {
           reject(error);
         }
-        console.log("result in model", rows);
         resolve(rows);
       }
     );
   });
-  console.log("user in model", user);
   return user;
 };
 
@@ -81,7 +78,6 @@ const getAllRecordsByUserId = async (uid) => {
       }
     );
   });
-  console.log("records in model", records);
   return records;
 };
 
@@ -92,13 +88,9 @@ const userIdExisted = async (userId) => {
         if (err) {
           throw err;
         }
-        rows.forEach((row) => {
-          console.log(row.user_id);
-        });
         resolve(rows);
       });
     });
-    console.log("ret in model", results);
     return results;
   } catch (e) {
     console.log(e);
@@ -107,19 +99,14 @@ const userIdExisted = async (userId) => {
 
 const getUserLogin = async (userId) => {
   try {
-    console.log(userId);
     var results = new Promise((resolve, reject) => {
       db.all(`SELECT * FROM users WHERE user_id = ?`, [userId], (err, rows) => {
         if (err) {
           throw err;
         }
-        rows.forEach((row) => {
-          console.log(row.user_id);
-        });
         resolve(rows);
       });
     });
-    console.log("ret in model", results);
     return results;
   } catch (e) {
     console.log(e);
