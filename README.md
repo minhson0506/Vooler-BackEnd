@@ -44,7 +44,7 @@ To install this project, follow these steps:
 ## Usage
 
 To use this project, you will need to send HTTP requests to the server using your preferred method (e.g. cURL, Postman). 
-The server has the following endpoints available as in the [API documentation](https://www.notion.so/dieuv/API-doc-finalized-b7f9f717c82a46d09129668739d7cb76
+The server has the following endpoints available as in the [API documentation](https://www.notion.so/dieuv/API-doc-finalized-b7f9f717c82a46d09129668739d7cb76).
 
 ## License
 
