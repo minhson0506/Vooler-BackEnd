@@ -20,7 +20,6 @@ passport.use(
     async (userId, password, done) => {
       try {
         const [user] = await getUserLogin(userId);
-        console.log("Local strategy", user); // result is binary row
         if (!user) {
           return done(null, false, { message: "Incorrect user Id" });
         }
@@ -44,7 +43,6 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET,
     },
     (jwtPayload, done) => {
-      console.log("jwtpayload", jwtPayload);
       return done(null, jwtPayload);
     }
   )

@@ -1,5 +1,6 @@
+require("dotenv").config();
 const sqlite3 = require("sqlite3").verbose();
-const filepath = "./vooler.db";
+const filepath = process.env.DB_FILE;
 const fs = require("fs");
 const { seedData } = require("./seedDb");
 

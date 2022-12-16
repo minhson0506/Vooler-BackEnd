@@ -30,12 +30,10 @@ const userGetById = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   var uid;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
   const user = await fetchModel.getUserByUserId(uid);
   delete user.password;
-  console.log("result in controller", user);
   res.json(user);
 };
 
@@ -53,12 +51,10 @@ const userGetAllRecords = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   var uid;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
   const records = await fetchModel.getAllRecordsByUserId(uid);
   const processedUserDTO = processUserData(records, false);
-  console.log("user records", records);
   res.json(processedUserDTO);
 };
 
@@ -66,7 +62,6 @@ const userGetRecordFromLastSundayToDate = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   var uid;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    console.log("userid decoded", decoded.uid);
     uid = decoded.uid;
   });
   const records = await fetchModel.getRecordsByUidWithEndDate(
@@ -82,7 +77,6 @@ const userEditInfo = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      console.log("userid decoded", decoded.uid);
       uid = decoded.uid;
     });
   } catch (e) {
@@ -90,7 +84,6 @@ const userEditInfo = async (req, res, next) => {
   }
 
   const originalUser = await fetchModel.getUserByUserId(uid);
-  console.log("originalUser", originalUser);
 
   var editedUser = {};
   editedUser.uid = uid;
@@ -99,13 +92,11 @@ const userEditInfo = async (req, res, next) => {
     ? req.body.password
     : originalUser.password;
   editedUser.teamId = req.body.teamId ? req.body.teamId : originalUser.team_id;
-  console.log("editedUser", editedUser);
 
   try {
     await fetchModel.updateUserInfo(editedUser, uid);
     res.status(200).json({ message: "updated userInfo" });
   } catch (e) {
-    console.log("edit info for user error", e.message);
     res.status(400).json({ error: "cannot update, recheck input" });
     return;
   }
